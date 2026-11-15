@@ -1,9 +1,10 @@
+import { setFormField, fieldError } from '../../../../../shared/testing/form-field.helpers';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { HttpErrorResponse } from '@angular/common/http';
+import { ProductError } from '../../../domain/errors/product.error';
 import { Router, provideRouter } from '@angular/router';
 import { Subject, of, throwError } from 'rxjs';
 import { ProductFormPage } from './product-form-page';
-import { PRODUCT_REPOSITORY } from '../../../domain/repositories/product-repository.token';
+import { ProductService } from '../../../application/product.service';
 import { Product } from '../../../domain/models/product.model';
 import { MOCK_PRODUCTS } from '../../../data/mocks/products.mock';
 import { todayIso, revisionDate } from '../../validators/product-form.validators';
@@ -11,7 +12,11 @@ import { todayIso, revisionDate } from '../../validators/product-form.validators
 describe('ProductFormPage', () => {
   let fixture: ComponentFixture<ProductFormPage>;
   let component: ProductFormPage;
-  const repository = { exists: jest.fn(), create: jest.fn() };
+  const repository = {
+    exists: jest.fn(),
+    create: jest.fn(),
+    errorMessage: ProductService.prototype.errorMessage,
+  };
   let navigate: jest.SpyInstance;
 
   beforeEach(async () => {
@@ -19,7 +24,7 @@ describe('ProductFormPage', () => {
     repository.create.mockReset().mockImplementation((product: Product) => of(product));
     await TestBed.configureTestingModule({
       imports: [ProductFormPage],
-      providers: [provideRouter([]), { provide: PRODUCT_REPOSITORY, useValue: repository }],
+      providers: [provideRouter([]), { provide: ProductService, useValue: repository }],
     }).compileComponents();
     navigate = jest.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
     fixture = TestBed.createComponent(ProductFormPage);
@@ -28,11 +33,11 @@ describe('ProductFormPage', () => {
   });
 
   async function validForm(): Promise<void> {
-    component.setField('id', 'new-001');
-    component.setField('name', MOCK_PRODUCTS[0].name);
-    component.setField('description', MOCK_PRODUCTS[0].description);
-    component.setField('logo', MOCK_PRODUCTS[0].logo);
-    component.setField('date_release', todayIso());
+    setFormField(fixture, 'id', 'new-001');
+    setFormField(fixture, 'name', MOCK_PRODUCTS[0].name);
+    setFormField(fixture, 'description', MOCK_PRODUCTS[0].description);
+    setFormField(fixture, 'logo', MOCK_PRODUCTS[0].logo);
+    setFormField(fixture, 'dateRelease', todayIso());
     await new Promise((resolve) => setTimeout(resolve, 350));
     await fixture.whenStable();
   }
@@ -52,10 +57,10 @@ describe('ProductFormPage', () => {
     ['description', 'Corta', 'Mínimo 10'],
     ['description', 'a'.repeat(201), 'Máximo 200'],
     ['logo', '   ', 'requerido'],
-    ['date_release', '2000-01-01', 'posterior a hoy'],
+    ['dateRelease', '2000-01-01', 'posterior a hoy'],
   ] as const)('valida %s con %s', (field, value, message) => {
-    component.setField(field, value);
-    expect(component.errorFor(field)).toContain(message);
+    setFormField(fixture, field, value);
+    expect(fieldError(fixture, field)).toContain(message);
     expect(component.canSubmit()).toBe(false);
   });
 
@@ -84,7 +89,7 @@ describe('ProductFormPage', () => {
   });
 
   it('no consulta la API si el ID tiene longitud inválida', async () => {
-    component.setField('id', 'ab');
+    setFormField(fixture, 'id', 'ab');
     await new Promise((resolve) => setTimeout(resolve, 350));
     expect(repository.exists).not.toHaveBeenCalled();
   });
@@ -93,15 +98,15 @@ describe('ProductFormPage', () => {
     repository.exists.mockReturnValue(of(true));
     await validForm();
     expect(repository.exists).toHaveBeenCalledWith('new-001');
-    expect(component.errorFor('id')).toContain('ya existe');
+    expect(fieldError(fixture, 'id')).toContain('ya existe');
     component.submit();
     expect(repository.create).not.toHaveBeenCalled();
   });
 
   it('muestra el fallo de verificación y permite reintentar', async () => {
-    repository.exists.mockReturnValue(throwError(() => new HttpErrorResponse({ status: 503 })));
+    repository.exists.mockReturnValue(throwError(() => new ProductError('service', 503)));
     await validForm();
-    expect(component.errorFor('id')).toContain('No se pudo verificar');
+    expect(fieldError(fixture, 'id')).toContain('No se pudo verificar');
     expect(component.canSubmit()).toBe(false);
     repository.exists.mockReturnValue(of(false));
     component.retryVerification();
@@ -112,7 +117,7 @@ describe('ProductFormPage', () => {
 
   it('calcula la revisión, envía el producto y vuelve al listado', async () => {
     await validForm();
-    expect(component.form.controls.date_revision.value).toBe(revisionDate(todayIso()));
+    expect(component.form.controls.dateRevision.value).toBe(revisionDate(todayIso()));
     const submit = fixture.nativeElement.querySelector(
       'button[type="submit"]',
     ) as HTMLButtonElement;
@@ -124,8 +129,8 @@ describe('ProductFormPage', () => {
       name: MOCK_PRODUCTS[0].name,
       description: MOCK_PRODUCTS[0].description,
       logo: MOCK_PRODUCTS[0].logo,
-      date_release: todayIso(),
-      date_revision: revisionDate(todayIso()),
+      dateRelease: todayIso(),
+      dateRevision: revisionDate(todayIso()),
     });
     expect(navigate).toHaveBeenCalledWith(['/products']);
   });
@@ -138,7 +143,7 @@ describe('ProductFormPage', () => {
     component.submit();
     expect(repository.create).toHaveBeenCalledTimes(1);
     expect(component.saving()).toBe(true);
-    response.error(new HttpErrorResponse({ status: 500 }));
+    response.error(new ProductError('service', 500));
     await fixture.whenStable();
     expect(fixture.nativeElement.textContent).toContain('Error de servicio 500');
     expect(component.saving()).toBe(false);
@@ -153,7 +158,7 @@ describe('ProductFormPage', () => {
     expect(Object.values(component.form.getRawValue()).every((value) => value === '')).toBe(true);
     expect(component.form.pristine).toBe(true);
     expect(component.form.untouched).toBe(true);
-    expect(component.form.controls.date_revision.disabled).toBe(true);
+    expect(component.form.controls.dateRevision.disabled).toBe(true);
     expect(component.canSubmit()).toBe(false);
   });
 });

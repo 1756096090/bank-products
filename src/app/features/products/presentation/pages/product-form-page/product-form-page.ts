@@ -6,12 +6,23 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { HttpErrorResponse } from '@angular/common/http';
+
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { finalize } from 'rxjs';
-import { PRODUCT_REPOSITORY } from '../../../domain/repositories/product-repository.token';
+import {
+  Subject,
+  catchError,
+  combineLatest,
+  distinctUntilChanged,
+  finalize,
+  map,
+  of,
+  startWith,
+  switchMap,
+} from 'rxjs';
+import { Product } from '../../../domain/models/product.model';
+import { ProductService } from '../../../application/product.service';
 import { InputField } from '../../../../../shared/components/input-field/input-field';
 import { InputDate } from '../../../../../shared/components/input-date/input-date';
 import { CustomButton } from '../../../../../shared/components/custom-button/custom-button';
@@ -23,8 +34,6 @@ import {
   uniqueProductId,
 } from '../../validators/product-form.validators';
 
-type FieldName = 'id' | 'name' | 'description' | 'logo' | 'date_release' | 'date_revision';
-
 @Component({
   selector: 'app-product-form-page',
   imports: [ReactiveFormsModule, InputField, InputDate, CustomButton],
@@ -33,62 +42,105 @@ type FieldName = 'id' | 'name' | 'description' | 'logo' | 'date_release' | 'date
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductFormPage {
-  private readonly repository = inject(PRODUCT_REPOSITORY);
+  private readonly productsService = inject(ProductService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   private readonly builder = inject(FormBuilder).nonNullable;
   private readonly destroyRef = inject(DestroyRef);
+  private readonly reload = new Subject<void>();
 
   readonly saving = signal(false);
   readonly serviceError = signal('');
+  readonly loading = signal(false);
+  readonly loadError = signal('');
+  readonly editingId = signal<string | null>(null);
+  readonly originalProduct = signal<Product | null>(null);
+  readonly isEditing = computed(() => this.editingId() !== null);
+  readonly fieldsDisabled = computed(() => this.loading() || this.saving() || !!this.loadError());
   readonly today = todayIso();
+  readonly minimumReleaseDate = computed(() => {
+    const original = this.originalProduct()?.dateRelease;
+    return original && original < this.today ? original : this.today;
+  });
 
   readonly form = this.builder.group({
     id: [
       '',
       [trimmedRequired, Validators.minLength(3), Validators.maxLength(10)],
-      [uniqueProductId(this.repository)],
+      [uniqueProductId(this.productsService)],
     ],
     name: ['', [trimmedRequired, Validators.minLength(5), Validators.maxLength(100)]],
     description: ['', [trimmedRequired, Validators.minLength(10), Validators.maxLength(200)]],
     logo: ['', trimmedRequired],
-    date_release: ['', [Validators.required, releaseDateValidator]],
-    date_revision: [{ value: '', disabled: true }],
+    dateRelease: [
+      '',
+      [
+        Validators.required,
+        (control) =>
+          this.isEditing() && control.value === this.originalProduct()?.dateRelease
+            ? null
+            : releaseDateValidator(control),
+      ],
+    ],
+    dateRevision: [{ value: '', disabled: true }],
   });
 
-  private readonly formState = toSignal(this.form.events, { initialValue: null });
-  readonly canSubmit = computed(() => {
-    this.formState();
-    return this.form.valid && !this.form.pending && !this.saving();
+  private readonly formStatus = toSignal(this.form.statusChanges, {
+    initialValue: this.form.status,
   });
+  readonly idStatus = toSignal(this.form.controls.id.statusChanges, {
+    initialValue: this.form.controls.id.status,
+  });
+  readonly canSubmit = computed(() => this.formStatus() === 'VALID' && !this.fieldsDisabled());
 
   constructor() {
-    this.form.controls.date_release.valueChanges.pipe(takeUntilDestroyed()).subscribe((value) => {
-      this.form.controls.date_revision.setValue(revisionDate(value));
+    this.form.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => this.serviceError.set(''));
+    this.form.controls.dateRelease.valueChanges.pipe(takeUntilDestroyed()).subscribe((value) => {
+      this.form.controls.dateRevision.setValue(revisionDate(value));
     });
+    combineLatest([
+      this.route.paramMap.pipe(
+        map((params) => params.get('id')),
+        distinctUntilChanged(),
+      ),
+      this.reload.pipe(startWith(undefined)),
+    ])
+      .pipe(
+        map(([id]) => id),
+        switchMap((id) => {
+          this.editingId.set(id);
+          this.originalProduct.set(null);
+          this.serviceError.set('');
+          this.loadError.set('');
+          this.form.reset();
+          if (!id) {
+            this.form.controls.id.enable();
+            return of(null);
+          }
+          this.form.controls.id.disable();
+          this.loading.set(true);
+          return this.productsService.getById(id).pipe(
+            catchError((error: unknown) => {
+              this.loadError.set(this.productsService.errorMessage(error, 'load'));
+              return of(null);
+            }),
+            finalize(() => this.loading.set(false)),
+          );
+        }),
+        takeUntilDestroyed(),
+      )
+      .subscribe((product) => {
+        const id = this.editingId();
+        if (!product || !id) return;
+        // El ID de la URL identifica el producto que se edita.
+        const original = { ...product, id };
+        this.originalProduct.set(original);
+        this.form.reset({ ...original, dateRevision: revisionDate(original.dateRelease) });
+      });
   }
 
-  setField(field: FieldName, value: string): void {
-    const control = this.form.controls[field];
-    control.markAsDirty();
-    control.setValue(value);
-    this.serviceError.set('');
-  }
-
-  errorFor(field: FieldName): string {
-    this.formState();
-    const control = this.form.controls[field];
-    if (!control.touched && !control.dirty) return '';
-    const prefix = field === 'id' ? 'ID no válido! ' : '';
-    if (control.hasError('required')) return `${prefix}Este campo es requerido.`;
-    if (control.hasError('minlength'))
-      return `${prefix}Mínimo ${control.getError('minlength').requiredLength} caracteres.`;
-    if (control.hasError('maxlength'))
-      return `${prefix}Máximo ${control.getError('maxlength').requiredLength} caracteres.`;
-    if (control.hasError('idExists')) return 'ID no válido! El ID ya existe.';
-    if (control.hasError('verificationFailed'))
-      return 'No se pudo verificar el ID. Intenta de nuevo.';
-    if (control.hasError('releaseDate')) return 'La fecha debe ser igual o posterior a hoy.';
-    return '';
+  retryLoad(): void {
+    if (!this.loading() && !this.saving()) this.reload.next();
   }
 
   retryVerification(): void {
@@ -96,24 +148,30 @@ export class ProductFormPage {
   }
 
   reset(): void {
-    if (this.saving()) return;
-    this.form.reset();
+    if (this.fieldsDisabled()) return;
+    const original = this.originalProduct();
+    this.form.reset(
+      original ? { ...original, dateRevision: revisionDate(original.dateRelease) } : {},
+    );
     this.serviceError.set('');
   }
 
   submit(): void {
-    if (this.saving()) return;
-    this.form.controls.date_release.updateValueAndValidity();
+    if (this.fieldsDisabled()) return;
+    this.form.controls.dateRelease.updateValueAndValidity();
     this.form.markAllAsTouched();
     if (this.form.invalid || this.form.pending) return;
     const product = this.form.getRawValue();
     // Recalcular la revisión antes de guardar.
-    product.date_revision = revisionDate(product.date_release);
-    if (!product.date_revision) return;
+    product.dateRevision = revisionDate(product.dateRelease);
+    if (!product.dateRevision) return;
     this.saving.set(true);
     this.serviceError.set('');
-    this.repository
-      .create(product)
+    const id = this.editingId();
+    const request = id
+      ? this.productsService.update(id, { ...product, id })
+      : this.productsService.create(product);
+    request
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.saving.set(false)),
@@ -123,13 +181,7 @@ export class ProductFormPage {
           void this.router.navigate(['/products']);
         },
         error: (error: unknown) => {
-          this.serviceError.set(
-            error instanceof HttpErrorResponse
-              ? error.status === 0
-                ? 'No se pudo conectar con el servicio. Intenta de nuevo.'
-                : `Error de servicio ${error.status}: no se pudo guardar el producto.`
-              : 'No se pudo guardar el producto. Intenta de nuevo.',
-          );
+          this.serviceError.set(this.productsService.errorMessage(error, 'save'));
         },
       });
   }

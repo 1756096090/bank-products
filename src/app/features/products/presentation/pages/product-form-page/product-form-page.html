@@ -1,23 +1,30 @@
 <section class="product-form-page">
   <div class="product-form-page__card">
     <header>
-      <h1>Formulario de Registro</h1>
+      <h1>{{ isEditing() ? 'Formulario de Edición' : 'Formulario de Registro' }}</h1>
     </header>
+    @if (loading()) {
+      <p class="product-form-page__status" role="status">Cargando producto…</p>
+    }
+    @if (loadError()) {
+      <div class="product-form-page__load-error">
+        <p role="alert">{{ loadError() }}</p>
+        <button type="button" class="product-form-page__retry" (click)="retryLoad()">
+          Reintentar
+        </button>
+      </div>
+    }
     <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
-      <div class="product-form-page__fields">
+      <fieldset class="product-form-page__fields" [disabled]="fieldsDisabled()">
         <div>
           <app-input-field
+            formControlName="id"
             label="ID"
             placeholder=""
             hint="De 3 a 10 caracteres"
             [required]="true"
-            [value]="form.controls.id.value"
-            (valueChange)="setField('id', $event)"
-            (blurred)="form.controls.id.markAsTouched()"
-            [error]="errorFor('id')"
-            [disabled]="saving()"
           />
-          @if (form.controls.id.pending) {
+          @if (idStatus() === 'PENDING') {
             <p role="status">Verificando ID…</p>
           }
           @if (form.controls.id.hasError('verificationFailed')) {
@@ -27,64 +34,47 @@
           }
         </div>
         <app-input-field
+          formControlName="name"
           label="Nombre"
           placeholder=""
           hint="De 5 a 100 caracteres"
           [required]="true"
-          [value]="form.controls.name.value"
-          (valueChange)="setField('name', $event)"
-          (blurred)="form.controls.name.markAsTouched()"
-          [error]="errorFor('name')"
-          [disabled]="saving()"
         />
         <app-input-field
+          formControlName="description"
           label="Descripción"
           placeholder=""
           hint="De 10 a 200 caracteres"
           [required]="true"
-          [value]="form.controls.description.value"
-          (valueChange)="setField('description', $event)"
-          (blurred)="form.controls.description.markAsTouched()"
-          [error]="errorFor('description')"
-          [disabled]="saving()"
         />
         <app-input-field
+          formControlName="logo"
           label="Logo"
           placeholder=""
           hint="URL de la imagen del producto"
           [required]="true"
-          [value]="form.controls.logo.value"
-          (valueChange)="setField('logo', $event)"
-          (blurred)="form.controls.logo.markAsTouched()"
-          [error]="errorFor('logo')"
-          [disabled]="saving()"
         />
         <app-input-date
+          formControlName="dateRelease"
           label="Fecha Liberación"
           [required]="true"
-          [min]="today"
-          [value]="form.controls.date_release.value"
-          (valueChange)="setField('date_release', $event)"
-          (blurred)="form.controls.date_release.markAsTouched()"
-          [error]="errorFor('date_release')"
-          [disabled]="saving()"
+          [min]="minimumReleaseDate()"
         />
         <app-input-date
+          formControlName="dateRevision"
           label="Fecha Revisión"
           hint="Un año después de la liberación"
-          [disabled]="true"
-          [value]="form.controls.date_revision.value"
         />
-      </div>
+      </fieldset>
       @if (serviceError()) {
         <p class="product-form-page__error" role="alert">{{ serviceError() }}</p>
       }
       <div class="product-form-page__actions">
-        <app-custom-button variant="secondary" [disabled]="saving()" (clicked)="reset()"
+        <app-custom-button variant="secondary" [disabled]="fieldsDisabled()" (clicked)="reset()"
           >Reiniciar</app-custom-button
         >
         <app-custom-button type="submit" [disabled]="!canSubmit()">{{
-          saving() ? 'Guardando…' : 'Enviar'
+          saving() ? 'Guardando…' : isEditing() ? 'Guardar cambios' : 'Enviar'
         }}</app-custom-button>
       </div>
     </form>

@@ -5,28 +5,30 @@
   <input
     class="input-field__control"
     [id]="fieldId()"
-    [class.input-field__control--invalid]="!!error()"
+    [class.input-field__control--invalid]="!!errorMessage()"
     [required]="required()"
     [readOnly]="readOnly()"
     [attr.min]="min()"
     [attr.max]="max()"
     [attr.aria-label]="label() ? null : placeholder()"
-    [attr.aria-invalid]="error() ? 'true' : null"
-    [attr.aria-describedby]="error() ? fieldId() + '-error' : hint() ? fieldId() + '-hint' : null"
+    [attr.aria-invalid]="errorMessage() ? 'true' : null"
+    [attr.aria-describedby]="
+      errorMessage() ? fieldId() + '-error' : hint() ? fieldId() + '-hint' : null
+    "
     [class.input-field__control--with-icon]="!!icon()"
     [type]="type()"
     [placeholder]="placeholder()"
     [value]="value()"
-    [disabled]="disabled()"
+    [disabled]="isDisabled()"
     (input)="onInput($event)"
-    (blur)="blurred.emit()"
+    (blur)="onBlur()"
   />
 
   @if (icon(); as iconName) {
     <button
       type="button"
       class="input-field__icon-button"
-      [disabled]="disabled()"
+      [disabled]="isDisabled()"
       [attr.aria-label]="iconLabel()"
       (click)="onIconClick()"
     >
@@ -34,13 +36,13 @@
     </button>
   }
 </div>
-@if (error()) {
+@if (errorMessage()) {
   <p
     class="input-field__message input-field__message--error"
     [id]="fieldId() + '-error'"
     role="alert"
   >
-    {{ error() }}
+    {{ errorMessage() }}
   </p>
 } @else if (hint()) {
   <p class="input-field__message" [id]="fieldId() + '-hint'">{{ hint() }}</p>

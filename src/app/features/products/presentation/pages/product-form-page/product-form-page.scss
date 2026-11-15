@@ -32,6 +32,10 @@
   }
 
   &__fields {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    min-width: 0;
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 24px 28px;
@@ -48,6 +52,16 @@
   &__error {
     color: var(--color-error);
     margin: 24px 0 0;
+  }
+
+  &__load-error {
+    padding: 16px 40px 0;
+    color: var(--color-error);
+  }
+
+  &__status {
+    padding: 16px 40px 0;
+    color: var(--color-text-muted);
   }
 
   &__retry {

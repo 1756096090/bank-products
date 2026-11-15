@@ -32,15 +32,15 @@ describe('InputDate', () => {
   it('recibe y emite fechas ISO sin convertirlas de zona horaria', async () => {
     const changed = jest.fn();
     fixture.componentInstance.value.subscribe(changed);
-    fixture.componentRef.setInput('value', MOCK_PRODUCTS[0].date_release);
+    fixture.componentRef.setInput('value', MOCK_PRODUCTS[0].dateRelease);
     await fixture.whenStable();
     const input = element.querySelector('input')!;
-    expect(input.value).toBe(MOCK_PRODUCTS[0].date_release);
-    input.value = MOCK_PRODUCTS[0].date_revision;
+    expect(input.value).toBe(MOCK_PRODUCTS[0].dateRelease);
+    input.value = MOCK_PRODUCTS[0].dateRevision;
     input.dispatchEvent(new Event('input'));
     await fixture.whenStable();
-    expect(changed).toHaveBeenCalledWith(MOCK_PRODUCTS[0].date_revision);
-    expect(fixture.componentInstance.value()).toBe(MOCK_PRODUCTS[0].date_revision);
+    expect(changed).toHaveBeenCalledWith(MOCK_PRODUCTS[0].dateRevision);
+    expect(fixture.componentInstance.value()).toBe(MOCK_PRODUCTS[0].dateRevision);
     input.value = '';
     input.dispatchEvent(new Event('input'));
     expect(changed).toHaveBeenLastCalledWith('');

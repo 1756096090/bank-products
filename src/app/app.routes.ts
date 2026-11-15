@@ -2,6 +2,13 @@ import { Routes } from '@angular/router';
 
 export const routes: Routes = [
   {
+    path: 'products/:id/edit',
+    loadComponent: () =>
+      import('./features/products/presentation/pages/product-form-page/product-form-page').then(
+        (m) => m.ProductFormPage,
+      ),
+  },
+  {
     path: 'products/new',
     loadComponent: () =>
       import('./features/products/presentation/pages/product-form-page/product-form-page').then(

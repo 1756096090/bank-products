@@ -1,6 +1,6 @@
 import { AbstractControl, AsyncValidatorFn, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { catchError, map, of, switchMap, timer } from 'rxjs';
-import { ProductRepository } from '../../domain/repositories/product.repository';
+import { ProductService } from '../../application/product.service';
 
 export function todayIso(): string {
   const date = new Date();
@@ -32,10 +32,10 @@ export const releaseDateValidator: ValidatorFn = (
 export const trimmedRequired: ValidatorFn = (control) =>
   typeof control.value === 'string' && control.value.trim() ? null : { required: true };
 
-export function uniqueProductId(repository: ProductRepository): AsyncValidatorFn {
+export function uniqueProductId(service: ProductService): AsyncValidatorFn {
   return (control) =>
     timer(300).pipe(
-      switchMap(() => repository.exists(control.value)),
+      switchMap(() => service.exists(control.value)),
       map((exists) => (exists ? { idExists: true } : null)),
       catchError(() => of({ verificationFailed: true })),
     );

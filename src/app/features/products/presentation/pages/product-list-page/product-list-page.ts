@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 
 import { DatePipe } from '@angular/common';
-import { RouterLink } from '@angular/router';
-import { HttpErrorResponse } from '@angular/common/http';
+import { Router, RouterLink } from '@angular/router';
+
 import { toSignal } from '@angular/core/rxjs-interop';
 import { catchError, of } from 'rxjs';
 
@@ -19,7 +19,7 @@ import { TableAction } from '../../../../../shared/components/data-table/models/
 
 // Dominio
 import { Product } from '../../../domain/models/product.model';
-import { PRODUCT_REPOSITORY } from '../../../domain/repositories/product-repository.token';
+import { ProductService } from '../../../application/product.service';
 
 @Component({
   selector: 'app-product-list-page',
@@ -37,7 +37,8 @@ import { PRODUCT_REPOSITORY } from '../../../domain/repositories/product-reposit
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductListPage {
-  private readonly productRepository = inject(PRODUCT_REPOSITORY);
+  private readonly productsService = inject(ProductService);
+  private readonly router = inject(Router);
 
   // Estado
   readonly loadError = signal<string | null>(null);
@@ -48,8 +49,8 @@ export class ProductListPage {
     { key: 'logo', header: 'Logo', width: '12%' },
     { key: 'name', header: 'Nombre del producto', width: '22%' },
     { key: 'description', header: 'Descripción', width: '28%' },
-    { key: 'date_release', header: 'Fecha de liberación', width: '19%' },
-    { key: 'date_revision', header: 'Fecha de reestructuración', width: '19%' },
+    { key: 'dateRelease', header: 'Fecha de liberación', width: '19%' },
+    { key: 'dateRevision', header: 'Fecha de reestructuración', width: '19%' },
   ];
 
   // Acciones
@@ -68,9 +69,9 @@ export class ProductListPage {
 
   // Productos
   readonly products = toSignal(
-    this.productRepository.getAll().pipe(
+    this.productsService.getAll().pipe(
       catchError((error: unknown) => {
-        this.loadError.set(this.getErrorMessage(error));
+        this.loadError.set(this.productsService.errorMessage(error, 'list'));
         return of([] as Product[]);
       }),
     ),
@@ -93,22 +94,8 @@ export class ProductListPage {
     );
   });
 
-  // Errores del servicio
-  private getErrorMessage(error: unknown): string {
-    if (error instanceof HttpErrorResponse) {
-      if (error.status === 0) {
-        return 'Error de conexión: no se pudo contactar con el servicio.';
-      }
-
-      return `Error de servicio ${error.status}: no se pudieron cargar los productos.`;
-    }
-
-    return 'Error de servicio: no se pudieron cargar los productos.';
-  }
-
-  // TODO: Navegar al formulario de edición.
   editProduct(product: Product): void {
-    console.log('Editar:', product);
+    void this.router.navigate(['/products', product.id, 'edit']);
   }
 
   // TODO: Confirmar y eliminar el producto.

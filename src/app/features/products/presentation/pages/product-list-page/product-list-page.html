@@ -40,13 +40,13 @@
       </ng-template>
 
       <!-- Fecha de liberación -->
-      <ng-template tableCell="date_release" let-product>
-        {{ product.date_release | date: 'dd/MM/yyyy' : 'UTC' }}
+      <ng-template tableCell="dateRelease" let-product>
+        {{ product.dateRelease | date: 'dd/MM/yyyy' : 'UTC' }}
       </ng-template>
 
       <!-- Fecha de reestructuración -->
-      <ng-template tableCell="date_revision" let-product>
-        {{ product.date_revision | date: 'dd/MM/yyyy' : 'UTC' }}
+      <ng-template tableCell="dateRevision" let-product>
+        {{ product.dateRevision | date: 'dd/MM/yyyy' : 'UTC' }}
       </ng-template>
     </app-data-table>
   </div>
