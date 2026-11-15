@@ -1,0 +1,33 @@
+@use '../../../../styles/breakpoints';
+
+.form-skeleton {
+  padding: 24px 40px 40px;
+  &__fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px 28px;
+  }
+  &__field {
+    display: grid;
+    gap: 8px;
+    min-width: 0;
+  }
+  &__actions {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    margin-top: 64px;
+  }
+
+  @media (max-width: breakpoints.$compact) {
+    padding: 24px 16px;
+    &__fields {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+    &__actions {
+      margin-top: 32px;
+      gap: 16px;
+    }
+  }
+}

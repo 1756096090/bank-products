@@ -1,0 +1,39 @@
+:host {
+  display: block;
+  max-width: 100%;
+  flex-shrink: 0;
+  border-radius: 5px;
+  background: linear-gradient(
+    90deg,
+    var(--color-skeleton-base) 25%,
+    var(--color-skeleton-highlight) 50%,
+    var(--color-skeleton-base) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-pulse 1.6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+:host(.skeleton--circle) {
+  border-radius: 50%;
+}
+
+@keyframes skeleton-pulse {
+  0% {
+    opacity: 0.55;
+    background-position: 100% 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.55;
+    background-position: -100% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host {
+    animation: none;
+  }
+}

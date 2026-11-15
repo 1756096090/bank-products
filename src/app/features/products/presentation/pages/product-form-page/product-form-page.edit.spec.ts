@@ -107,6 +107,8 @@ describe('ProductFormPage editing', () => {
     repository.getById.mockReturnValue(response);
     await createPage();
     expect(component.loading()).toBe(true);
+    expect(fixture.nativeElement.querySelector('app-form-skeleton')).not.toBeNull();
+    expect(fixture.nativeElement.querySelector('form')).toBeNull();
     expect(component.canSubmit()).toBe(false);
     component.submit();
     expect(repository.update).not.toHaveBeenCalled();
@@ -114,6 +116,8 @@ describe('ProductFormPage editing', () => {
     response.complete();
     await fixture.whenStable();
     expect(component.loading()).toBe(false);
+    expect(fixture.nativeElement.querySelector('app-form-skeleton')).toBeNull();
+    expect(fixture.nativeElement.querySelector('form')).not.toBeNull();
     expect(component.canSubmit()).toBe(true);
   });
 

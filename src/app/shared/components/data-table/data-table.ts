@@ -21,6 +21,8 @@ import { TableColumn } from './models/table-column.model';
 import { TableAction } from './models/table-action.model';
 import { TableCellDirective } from './table-cell.directive';
 import { Paginator } from '../paginator/paginator';
+import { Skeleton } from '../skeleton/skeleton';
+import { TableSkeleton } from '../table-skeleton/table-skeleton';
 
 interface MenuPosition {
   top: number;
@@ -33,7 +35,7 @@ const VIEWPORT_MARGIN = 8;
 
 @Component({
   selector: 'app-data-table',
-  imports: [NgTemplateOutlet, Icon, Paginator],
+  imports: [NgTemplateOutlet, Icon, Paginator, Skeleton, TableSkeleton],
   templateUrl: './data-table.html',
   styleUrl: './data-table.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -51,6 +53,7 @@ export class DataTable<T extends object> {
 
   readonly columns = input.required<readonly TableColumn<T>[]>();
   readonly rows = input.required<readonly T[]>();
+  readonly loading = input(false);
   readonly errorMessage = input<string | null>(null);
   readonly actions = input<readonly TableAction<T>[]>([]);
 

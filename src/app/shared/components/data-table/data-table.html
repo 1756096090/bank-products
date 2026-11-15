@@ -1,4 +1,7 @@
-<section class="data-table">
+<section class="data-table" [attr.aria-busy]="loading()">
+  @if (loading()) {
+    <p class="data-table__sr-only" role="status">Cargando productos…</p>
+  }
   <!-- Encabezado -->
   <header class="data-table__header">
     <div class="data-table__title">
@@ -31,109 +34,121 @@
       </thead>
 
       <!-- Registros -->
-      <tbody class="data-table__tbody">
-        @if (errorMessage(); as message) {
-          <tr class="data-table__row">
-            <td [attr.colspan]="columns().length + (actions().length > 0 ? 1 : 0)">
-              <div class="data-table__error" role="alert">
-                <app-icon name="error_outline" />
-                <span>{{ message }}</span>
-              </div>
-            </td>
-          </tr>
-        } @else {
-          @for (row of visibleRows(); track row) {
+      @if (loading()) {
+        <tbody
+          appTableSkeleton
+          [columns]="columns().length + (actions().length > 0 ? 1 : 0)"
+          [rows]="pageSize()"
+        ></tbody>
+      } @else {
+        <tbody class="data-table__tbody">
+          @if (errorMessage(); as message) {
             <tr class="data-table__row">
-              <!-- Columnas -->
-              @for (column of columns(); track column.key) {
-                <td class="data-table__cell">
-                  @if (getCellTemplate(column.key); as cellTemplate) {
-                    <!-- Celda personalizada -->
-                    <ng-container
-                      [ngTemplateOutlet]="cellTemplate.template"
-                      [ngTemplateOutletContext]="{
-                        $implicit: row,
-                        value: row[column.key],
-                        column: column,
-                      }"
-                    />
-                  } @else {
-                    <!-- Texto -->
-                    {{ row[column.key] }}
-                  }
-                </td>
-              }
-
-              <!-- Acciones -->
-              @if (actions().length > 0) {
-                <td class="data-table__cell data-table__cell--actions">
-                  <div class="data-table__action-wrapper">
-                    <button
-                      #actionTrigger
-                      type="button"
-                      class="data-table__action-button"
-                      aria-label="Mostrar acciones"
-                      aria-haspopup="menu"
-                      [attr.aria-expanded]="openedRow() === row"
-                      (click)="toggleActions(row, actionTrigger)"
-                    >
-                      <app-icon name="more_vert" />
-                    </button>
-
-                    @if (openedRow() === row) {
-                      <div
-                        #actionMenu
-                        class="data-table__action-menu"
-                        role="menu"
-                        aria-label="Acciones del registro"
-                        [style.top.px]="menuPosition().top"
-                        [style.right.px]="menuPosition().right"
-                        (keydown)="onMenuKeydown($event)"
-                      >
-                        @for (action of actions(); track action.label) {
-                          <button
-                            type="button"
-                            role="menuitem"
-                            class="data-table__action-item"
-                            [style.width]="action.width"
-                            (click)="executeAction(action, row)"
-                          >
-                            @if (action.src) {
-                              <img class="data-table__action-image" [src]="action.src" alt="" />
-                            } @else if (action.icon) {
-                              <app-icon class="data-table__action-icon" [name]="action.icon" />
-                            }
-
-                            <span>{{ action.label }}</span>
-                          </button>
-                        }
-                      </div>
-                    }
-                  </div>
-                </td>
-              }
-            </tr>
-          } @empty {
-            <tr class="data-table__row">
-              <td
-                class="data-table__empty"
-                [attr.colspan]="columns().length + (actions().length > 0 ? 1 : 0)"
-              >
-                No hay registros disponibles.
+              <td [attr.colspan]="columns().length + (actions().length > 0 ? 1 : 0)">
+                <div class="data-table__error" role="alert">
+                  <app-icon name="error_outline" />
+                  <span>{{ message }}</span>
+                </div>
               </td>
             </tr>
+          } @else {
+            @for (row of visibleRows(); track row) {
+              <tr class="data-table__row">
+                <!-- Columnas -->
+                @for (column of columns(); track column.key) {
+                  <td class="data-table__cell">
+                    @if (getCellTemplate(column.key); as cellTemplate) {
+                      <!-- Celda personalizada -->
+                      <ng-container
+                        [ngTemplateOutlet]="cellTemplate.template"
+                        [ngTemplateOutletContext]="{
+                          $implicit: row,
+                          value: row[column.key],
+                          column: column,
+                        }"
+                      />
+                    } @else {
+                      <!-- Texto -->
+                      {{ row[column.key] }}
+                    }
+                  </td>
+                }
+
+                <!-- Acciones -->
+                @if (actions().length > 0) {
+                  <td class="data-table__cell data-table__cell--actions">
+                    <div class="data-table__action-wrapper">
+                      <button
+                        #actionTrigger
+                        type="button"
+                        class="data-table__action-button"
+                        aria-label="Mostrar acciones"
+                        aria-haspopup="menu"
+                        [attr.aria-expanded]="openedRow() === row"
+                        (click)="toggleActions(row, actionTrigger)"
+                      >
+                        <app-icon name="more_vert" />
+                      </button>
+
+                      @if (openedRow() === row) {
+                        <div
+                          #actionMenu
+                          class="data-table__action-menu"
+                          role="menu"
+                          aria-label="Acciones del registro"
+                          [style.top.px]="menuPosition().top"
+                          [style.right.px]="menuPosition().right"
+                          (keydown)="onMenuKeydown($event)"
+                        >
+                          @for (action of actions(); track action.label) {
+                            <button
+                              type="button"
+                              role="menuitem"
+                              class="data-table__action-item"
+                              [style.width]="action.width"
+                              (click)="executeAction(action, row)"
+                            >
+                              @if (action.src) {
+                                <img class="data-table__action-image" [src]="action.src" alt="" />
+                              } @else if (action.icon) {
+                                <app-icon class="data-table__action-icon" [name]="action.icon" />
+                              }
+
+                              <span>{{ action.label }}</span>
+                            </button>
+                          }
+                        </div>
+                      }
+                    </div>
+                  </td>
+                }
+              </tr>
+            } @empty {
+              <tr class="data-table__row">
+                <td
+                  class="data-table__empty"
+                  [attr.colspan]="columns().length + (actions().length > 0 ? 1 : 0)"
+                >
+                  No hay registros disponibles.
+                </td>
+              </tr>
+            }
           }
-        }
-      </tbody>
+        </tbody>
+      }
     </table>
   </div>
 
   <!-- Pie de tabla -->
   <footer class="data-table__footer">
-    <span class="data-table__results"> {{ total() }} Resultados </span>
+    @if (loading()) {
+      <app-skeleton width="100px" />
+    } @else {
+      <span class="data-table__results"> {{ total() }} Resultados </span>
+    }
 
     <div class="data-table__pagination">
-      @if (total() > 0 && !errorMessage()) {
+      @if (total() > 0 && !errorMessage() && !loading()) {
         <app-paginator
           [totalPages]="totalPages()"
           [(page)]="currentPage"
@@ -143,7 +158,12 @@
       <label class="data-table__page-size">
         <span class="data-table__sr-only"> Registros por página </span>
 
-        <select class="data-table__select" [value]="pageSize()" (change)="onPageSizeChange($event)">
+        <select
+          class="data-table__select"
+          [value]="pageSize()"
+          [disabled]="loading()"
+          (change)="onPageSizeChange($event)"
+        >
           @for (option of pageSizeOptions(); track option) {
             <option [value]="option">{{ option }}</option>
           }

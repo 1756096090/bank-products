@@ -1,10 +1,10 @@
 <section class="product-form-page">
-  <div class="product-form-page__card">
+  <div class="product-form-page__card" [attr.aria-busy]="loading()">
     <header>
       <h1>{{ isEditing() ? 'Formulario de Edición' : 'Formulario de Registro' }}</h1>
     </header>
     @if (loading()) {
-      <p class="product-form-page__status" role="status">Cargando producto…</p>
+      <app-form-skeleton />
     }
     @if (loadError()) {
       <div class="product-form-page__load-error">
@@ -14,69 +14,71 @@
         </button>
       </div>
     }
-    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
-      <fieldset class="product-form-page__fields" [disabled]="fieldsDisabled()">
-        <div>
+    @if (!loading()) {
+      <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <fieldset class="product-form-page__fields" [disabled]="fieldsDisabled()">
+          <div>
+            <app-input-field
+              formControlName="id"
+              label="ID"
+              placeholder=""
+              hint="De 3 a 10 caracteres"
+              [required]="true"
+            />
+            @if (idStatus() === 'PENDING') {
+              <p role="status">Verificando ID…</p>
+            }
+            @if (form.controls.id.hasError('verificationFailed')) {
+              <button type="button" class="product-form-page__retry" (click)="retryVerification()">
+                Verificar de nuevo
+              </button>
+            }
+          </div>
           <app-input-field
-            formControlName="id"
-            label="ID"
+            formControlName="name"
+            label="Nombre"
             placeholder=""
-            hint="De 3 a 10 caracteres"
+            hint="De 5 a 100 caracteres"
             [required]="true"
           />
-          @if (idStatus() === 'PENDING') {
-            <p role="status">Verificando ID…</p>
-          }
-          @if (form.controls.id.hasError('verificationFailed')) {
-            <button type="button" class="product-form-page__retry" (click)="retryVerification()">
-              Verificar de nuevo
-            </button>
-          }
+          <app-input-field
+            formControlName="description"
+            label="Descripción"
+            placeholder=""
+            hint="De 10 a 200 caracteres"
+            [required]="true"
+          />
+          <app-input-field
+            formControlName="logo"
+            label="Logo"
+            placeholder=""
+            hint="URL de la imagen del producto"
+            [required]="true"
+          />
+          <app-input-date
+            formControlName="dateRelease"
+            label="Fecha Liberación"
+            [required]="true"
+            [min]="minimumReleaseDate()"
+          />
+          <app-input-date
+            formControlName="dateRevision"
+            label="Fecha Revisión"
+            hint="Un año después de la liberación"
+          />
+        </fieldset>
+        @if (serviceError()) {
+          <p class="product-form-page__error" role="alert">{{ serviceError() }}</p>
+        }
+        <div class="product-form-page__actions">
+          <app-custom-button variant="secondary" [disabled]="fieldsDisabled()" (clicked)="reset()"
+            >Reiniciar</app-custom-button
+          >
+          <app-custom-button type="submit" [disabled]="!canSubmit()">{{
+            saving() ? 'Guardando…' : isEditing() ? 'Guardar cambios' : 'Enviar'
+          }}</app-custom-button>
         </div>
-        <app-input-field
-          formControlName="name"
-          label="Nombre"
-          placeholder=""
-          hint="De 5 a 100 caracteres"
-          [required]="true"
-        />
-        <app-input-field
-          formControlName="description"
-          label="Descripción"
-          placeholder=""
-          hint="De 10 a 200 caracteres"
-          [required]="true"
-        />
-        <app-input-field
-          formControlName="logo"
-          label="Logo"
-          placeholder=""
-          hint="URL de la imagen del producto"
-          [required]="true"
-        />
-        <app-input-date
-          formControlName="dateRelease"
-          label="Fecha Liberación"
-          [required]="true"
-          [min]="minimumReleaseDate()"
-        />
-        <app-input-date
-          formControlName="dateRevision"
-          label="Fecha Revisión"
-          hint="Un año después de la liberación"
-        />
-      </fieldset>
-      @if (serviceError()) {
-        <p class="product-form-page__error" role="alert">{{ serviceError() }}</p>
-      }
-      <div class="product-form-page__actions">
-        <app-custom-button variant="secondary" [disabled]="fieldsDisabled()" (clicked)="reset()"
-          >Reiniciar</app-custom-button
-        >
-        <app-custom-button type="submit" [disabled]="!canSubmit()">{{
-          saving() ? 'Guardando…' : isEditing() ? 'Guardar cambios' : 'Enviar'
-        }}</app-custom-button>
-      </div>
-    </form>
+      </form>
+    }
   </div>
 </section>

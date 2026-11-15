@@ -1,0 +1,7 @@
+@for (row of rowIndexes(); track row) {
+  <tr>
+    @for (column of columnIndexes(); track column) {
+      <td><app-skeleton [width]="column % 2 === 0 ? '85%' : '70%'" height="24px" /></td>
+    }
+  </tr>
+}

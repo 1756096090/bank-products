@@ -18,6 +18,8 @@ body {
   --font-family-base: Roboto, 'Helvetica Neue', Arial, sans-serif;
   --color-body-background: #faf9fd;
   --color-body-text: #1a1b1f;
+  --color-skeleton-base: var(--color-border);
+  --color-skeleton-highlight: var(--color-surface-table-header);
   --color-backdrop: rgb(0 0 0 / 55%);
   --color-field-error: #c34848;
   --color-input-border: #d0d5dd;

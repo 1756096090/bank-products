@@ -53,6 +53,7 @@ export class ProductListPage {
 
   // Estado
   readonly loadError = signal<string | null>(null);
+  readonly loading = signal(true);
   readonly searchTerm = signal('');
   readonly productToDelete = signal<Product | null>(null);
   readonly deleting = signal(false);
@@ -91,6 +92,7 @@ export class ProductListPage {
         this.loadError.set(this.productsService.errorMessage(error, 'list'));
         return of([] as Product[]);
       }),
+      finalize(() => this.loading.set(false)),
     ),
     { initialValue: [] as Product[] },
   );

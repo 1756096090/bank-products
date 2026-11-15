@@ -23,6 +23,7 @@
     <app-data-table
       [columns]="columns"
       [rows]="filteredProducts()"
+      [loading]="loading()"
       [actions]="tableActions"
       [errorMessage]="loadError()"
       [pageSizeOptions]="[5, 10, 20]"

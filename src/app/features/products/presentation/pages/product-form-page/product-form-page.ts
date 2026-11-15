@@ -26,6 +26,7 @@ import { ProductService } from '../../../application/product.service';
 import { InputField } from '../../../../../shared/components/input-field/input-field';
 import { InputDate } from '../../../../../shared/components/input-date/input-date';
 import { CustomButton } from '../../../../../shared/components/custom-button/custom-button';
+import { FormSkeleton } from '../../../../../shared/components/form-skeleton/form-skeleton';
 import {
   releaseDateValidator,
   revisionDate,
@@ -36,7 +37,7 @@ import {
 
 @Component({
   selector: 'app-product-form-page',
-  imports: [ReactiveFormsModule, InputField, InputDate, CustomButton],
+  imports: [ReactiveFormsModule, InputField, InputDate, CustomButton, FormSkeleton],
   templateUrl: './product-form-page.html',
   styleUrl: './product-form-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

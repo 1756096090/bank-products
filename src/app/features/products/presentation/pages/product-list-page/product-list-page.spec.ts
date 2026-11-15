@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ProductListPage } from './product-list-page';
-import { of, throwError } from 'rxjs';
+import { Subject, of, throwError } from 'rxjs';
+import { Product } from '../../../domain/models/product.model';
 import { ProductService } from '../../../application/product.service';
 import { MOCK_PRODUCTS } from '../../../data/mocks/products.mock';
 import { ProductError } from '../../../domain/errors/product.error';
@@ -25,6 +26,38 @@ describe('ProductListPage', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('muestra el skeleton mientras carga y luego lo reemplaza por los datos', async () => {
+    const response = new Subject<Product[]>();
+    repository.getAll.mockReturnValue(response);
+    const loadingFixture = TestBed.createComponent(ProductListPage);
+    await loadingFixture.whenStable();
+    const element = loadingFixture.nativeElement as HTMLElement;
+    expect(element.querySelector('tbody[appTableSkeleton]')).not.toBeNull();
+    expect(element.querySelector('.data-table__empty')).toBeNull();
+    expect(element.querySelector('.data-table')?.getAttribute('aria-busy')).toBe('true');
+    expect(element.querySelector('select')!.disabled).toBe(true);
+    response.next(MOCK_PRODUCTS);
+    response.complete();
+    await loadingFixture.whenStable();
+    expect(element.querySelector('tbody[appTableSkeleton]')).toBeNull();
+    expect(element.querySelector('.data-table')?.getAttribute('aria-busy')).toBe('false');
+    expect(element.textContent).toContain(MOCK_PRODUCTS[0].name);
+  });
+
+  it('reemplaza el skeleton por el error si falla la petición', async () => {
+    const response = new Subject<Product[]>();
+    repository.getAll.mockReturnValue(response);
+    const loadingFixture = TestBed.createComponent(ProductListPage);
+    await loadingFixture.whenStable();
+    response.error(new ProductError('service', 500));
+    await loadingFixture.whenStable();
+    expect(loadingFixture.nativeElement.querySelector('app-skeleton')).toBeNull();
+    expect(loadingFixture.nativeElement.querySelector('[role="alert"]').textContent).toContain(
+      '500',
+    );
+    expect(loadingFixture.componentInstance.loading()).toBe(false);
   });
 
   it('abre la edición con el ID del producto en la URL', () => {
@@ -96,7 +129,7 @@ describe('ProductListPage', () => {
       expect(element.querySelector('tbody [role="alert"]')?.textContent).toContain(
         `Error de servicio ${status}`,
       );
-      expect(element.querySelector('tbody mat-icon')).not.toBeNull();
+      expect(element.querySelector('tbody app-icon')).not.toBeNull();
       expect(element.querySelector('.data-table__empty')).toBeNull();
     },
   );

@@ -1,0 +1,15 @@
+<div class="form-skeleton" role="status" aria-label="Cargando formulario">
+  <div class="form-skeleton__fields" aria-hidden="true">
+    @for (field of fieldIndexes(); track field) {
+      <div class="form-skeleton__field">
+        <app-skeleton width="40%" height="14px" />
+        <app-skeleton height="42px" />
+        <app-skeleton width="60%" height="12px" />
+      </div>
+    }
+  </div>
+  <div class="form-skeleton__actions" aria-hidden="true">
+    <app-skeleton width="108px" height="48px" />
+    <app-skeleton width="108px" height="48px" />
+  </div>
+</div>
