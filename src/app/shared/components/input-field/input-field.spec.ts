@@ -20,6 +20,42 @@ describe('InputField', () => {
     expect(element.querySelector('button')).toBeNull();
   });
 
+  it('asocia el label y el hint al campo', async () => {
+    fixture.componentRef.setInput('label', 'Nombre');
+    fixture.componentRef.setInput('hint', 'Entre 5 y 100 caracteres');
+    await fixture.whenStable();
+    const input = element.querySelector('input')!;
+    expect(element.querySelector('label')!.htmlFor).toBe(input.id);
+    expect(
+      element.querySelector(`#${input.getAttribute('aria-describedby')}`)?.textContent,
+    ).toContain('Entre 5 y 100 caracteres');
+  });
+
+  it('prioriza el error sobre el hint y limpia el estado al corregirlo', async () => {
+    fixture.componentRef.setInput('hint', 'Escribe tu nombre');
+    fixture.componentRef.setInput('error', 'Este campo es requerido');
+    await fixture.whenStable();
+    const input = element.querySelector('input')!;
+    expect(input.getAttribute('aria-invalid')).toBe('true');
+    expect(input.classList.contains('input-field__control--invalid')).toBe(true);
+    const alert = element.querySelector('[role="alert"]')!;
+    expect(input.getAttribute('aria-describedby')).toBe(alert.id);
+    expect(element.querySelectorAll('.input-field__message')).toHaveLength(1);
+    fixture.componentRef.setInput('error', '');
+    await fixture.whenStable();
+    expect(input.hasAttribute('aria-invalid')).toBe(false);
+    expect(element.querySelector('[role="alert"]')).toBeNull();
+    expect(element.textContent).toContain('Escribe tu nombre');
+  });
+
+  it('genera identificadores distintos entre campos', async () => {
+    const another = TestBed.createComponent(InputField);
+    await another.whenStable();
+    expect(element.querySelector('input')!.id).not.toBe(
+      another.nativeElement.querySelector('input').id,
+    );
+  });
+
   it('actualiza el valor y notifica al padre al escribir', async () => {
     const changed = jest.fn();
     fixture.componentInstance.value.subscribe(changed);

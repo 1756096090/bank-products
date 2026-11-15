@@ -1,0 +1,14 @@
+<app-input-field
+  type="date"
+  placeholder="Selecciona una fecha"
+  [label]="label()"
+  [hint]="hint()"
+  [error]="error()"
+  [disabled]="disabled()"
+  [required]="required()"
+  [readOnly]="readOnly()"
+  [min]="min()"
+  [max]="max()"
+  [(value)]="value"
+  (blurred)="blurred.emit()"
+/>

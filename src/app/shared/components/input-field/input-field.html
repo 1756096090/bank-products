@@ -1,12 +1,25 @@
+@if (label()) {
+  <label class="input-field__label" [for]="fieldId()">{{ label() }}</label>
+}
 <div class="input-field">
   <input
     class="input-field__control"
+    [id]="fieldId()"
+    [class.input-field__control--invalid]="!!error()"
+    [required]="required()"
+    [readOnly]="readOnly()"
+    [attr.min]="min()"
+    [attr.max]="max()"
+    [attr.aria-label]="label() ? null : placeholder()"
+    [attr.aria-invalid]="error() ? 'true' : null"
+    [attr.aria-describedby]="error() ? fieldId() + '-error' : hint() ? fieldId() + '-hint' : null"
     [class.input-field__control--with-icon]="!!icon()"
     [type]="type()"
     [placeholder]="placeholder()"
     [value]="value()"
     [disabled]="disabled()"
     (input)="onInput($event)"
+    (blur)="blurred.emit()"
   />
 
   @if (icon(); as iconName) {
@@ -21,3 +34,14 @@
     </button>
   }
 </div>
+@if (error()) {
+  <p
+    class="input-field__message input-field__message--error"
+    [id]="fieldId() + '-error'"
+    role="alert"
+  >
+    {{ error() }}
+  </p>
+} @else if (hint()) {
+  <p class="input-field__message" [id]="fieldId() + '-hint'">{{ hint() }}</p>
+}
