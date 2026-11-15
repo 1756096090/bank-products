@@ -32,7 +32,7 @@
       [attr.aria-label]="iconLabel()"
       (click)="onIconClick()"
     >
-      <mat-icon aria-hidden="true">{{ iconName }}</mat-icon>
+      <app-icon [name]="iconName" />
     </button>
   }
 </div>

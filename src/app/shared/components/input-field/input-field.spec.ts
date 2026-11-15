@@ -87,7 +87,7 @@ describe('InputField', () => {
     await fixture.whenStable();
     const button = element.querySelector('button')!;
     expect(button.getAttribute('aria-label')).toBe('Buscar productos');
-    expect(button.querySelector('mat-icon')?.textContent?.trim()).toBe('search');
+    expect(button.querySelector('app-icon')?.textContent?.trim()).toBe('search');
     button.click();
     expect(clicked).toHaveBeenCalledWith('Visa');
   });

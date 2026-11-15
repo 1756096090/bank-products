@@ -2,13 +2,13 @@ import { ChangeDetectionStrategy, Component, forwardRef, input, output } from '@
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { ValueFieldControl } from '../../forms/value-field-control';
 
-import { MatIconModule } from '@angular/material/icon';
+import { Icon } from '../icon/icon';
 
 let nextFieldId = 0;
 
 @Component({
   selector: 'app-input-field',
-  imports: [MatIconModule],
+  imports: [Icon],
   providers: [
     { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => InputField), multi: true },
   ],

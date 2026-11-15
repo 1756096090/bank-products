@@ -5,7 +5,7 @@
     [disabled]="page() <= 1"
     (click)="goTo(page() - 1)"
   >
-    <mat-icon aria-hidden="true">chevron_left</mat-icon>
+    <app-icon name="chevron_left" />
   </button>
 
   @if (visiblePages()[0] > 1) {
@@ -33,6 +33,6 @@
     [disabled]="page() >= totalPages()"
     (click)="goTo(page() + 1)"
   >
-    <mat-icon aria-hidden="true">chevron_right</mat-icon>
+    <app-icon name="chevron_right" />
   </button>
 </nav>

@@ -15,7 +15,7 @@ import {
 } from '@angular/core';
 
 import { NgTemplateOutlet } from '@angular/common';
-import { MatIconModule } from '@angular/material/icon';
+import { Icon } from '../icon/icon';
 
 import { TableColumn } from './models/table-column.model';
 import { TableAction } from './models/table-action.model';
@@ -33,7 +33,7 @@ const VIEWPORT_MARGIN = 8;
 
 @Component({
   selector: 'app-data-table',
-  imports: [NgTemplateOutlet, MatIconModule, Paginator],
+  imports: [NgTemplateOutlet, Icon, Paginator],
   templateUrl: './data-table.html',
   styleUrl: './data-table.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

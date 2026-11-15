@@ -36,7 +36,7 @@
           <tr class="data-table__row">
             <td [attr.colspan]="columns().length + (actions().length > 0 ? 1 : 0)">
               <div class="data-table__error" role="alert">
-                <mat-icon aria-hidden="true">error_outline</mat-icon>
+                <app-icon name="error_outline" />
                 <span>{{ message }}</span>
               </div>
             </td>
@@ -77,7 +77,7 @@
                       [attr.aria-expanded]="openedRow() === row"
                       (click)="toggleActions(row, actionTrigger)"
                     >
-                      <mat-icon aria-hidden="true">more_vert</mat-icon>
+                      <app-icon name="more_vert" />
                     </button>
 
                     @if (openedRow() === row) {
@@ -101,9 +101,7 @@
                             @if (action.src) {
                               <img class="data-table__action-image" [src]="action.src" alt="" />
                             } @else if (action.icon) {
-                              <mat-icon class="data-table__action-icon" aria-hidden="true">
-                                {{ action.icon }}
-                              </mat-icon>
+                              <app-icon class="data-table__action-icon" [name]="action.icon" />
                             }
 
                             <span>{{ action.label }}</span>

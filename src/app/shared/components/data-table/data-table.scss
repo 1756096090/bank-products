@@ -123,7 +123,7 @@
     color: var(--color-text-secondary);
     cursor: pointer;
 
-    .mat-icon {
+    app-icon {
       @include mixins.icon-size(24px);
       flex-shrink: 0;
     }
@@ -177,7 +177,7 @@
     flex-shrink: 0;
   }
 
-  &__action-icon.mat-icon {
+  &__action-icon {
     font-size: 20px;
     line-height: 20px;
   }

@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, computed, input, model } from '@angular/core';
-import { MatIconModule } from '@angular/material/icon';
+import { Icon } from '../icon/icon';
 
 @Component({
   selector: 'app-paginator',
-  imports: [MatIconModule],
+  imports: [Icon],
   templateUrl: './paginator.html',
   styleUrl: './paginator.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
