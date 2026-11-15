@@ -28,7 +28,8 @@ To use sample data, set `useMocks: true` in `src/environments/environment.develo
 - `features/products/data`: HTTP and mock repository implementations.
 - `features/products/presentation`: product page and UI logic.
 - `shared/components`: reusable table, avatar and header.
-- `core/http`: HTTP logging interceptor with automatic request IDs.
+- `core/http`: HTTP interceptor with structured logs and the Correlation ID pattern. Each request generates a UUID, sent as `X-Request-ID` and shared by its request, response and error logs.
+- `styles`: shared SCSS breakpoints and mixins. Colors are defined in `src/styles.scss`.
 
 Dependency injection selects the repository implementation, keeping the page independent of the data source.
 
@@ -47,6 +48,19 @@ npm run build
 
 Output: `dist/bank-products`.
 
+## Conventions
+
+SCSS classes follow BEM: `block__element--modifier`, for example `input-field__control--invalid`.
+
+Use Conventional Commits, for example: `feat(products): add registration form` or `fix(table): correct mobile menu`.
+
+Prettier formats the code. Husky runs it through lint-staged before each commit, formats staged files and blocks the commit if formatting fails.
+
+```bash
+npm run format
+npm run format:check
+```
+
 ## Pending
 
-Search, editing and deletion are pending implementation.
+Editing and deletion are pending implementation.
