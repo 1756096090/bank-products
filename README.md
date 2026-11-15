@@ -1,66 +1,70 @@
-# Devsu Angular Technical Assessment
+# Prueba técnica Angular para Devsu
 
-Financial Products Management System built with Angular 22, TypeScript, Clean Architecture, SOLID principles and Jest.
+Sistema de gestión de productos financieros desarrollado con Angular 22, TypeScript, arquitectura limpia, principios SOLID y Jest.
 
-## Installation
+## Instalación
 
-Requires Node.js 22.22.3+ (22.x) or 24.15.0+ (24.x), and npm.
+Requiere Node.js 22.22.3 o superior dentro de 22.x, o 24.15.0 o superior dentro de 24.x, y npm.
 
 ```bash
 npm ci
 ```
 
-## Run
+## Ejecución
 
-Start the backend at `http://localhost:3002`, then run:
+Inicia el backend en `http://localhost:3002` y ejecuta:
 
 ```bash
 npm start
 ```
 
-Open `http://localhost:4200`. The development proxy forwards `/bp` requests to the backend.
+Abre `http://localhost:4200`. El proxy de desarrollo redirige las peticiones `/bp` al backend.
 
-To use sample data, set `useMocks: true` in `src/environments/environment.development.ts`.
+Para usar datos de prueba, configura `useMocks: true` en `src/environments/environment.development.ts`.
 
-## Architecture
+## Arquitectura
 
-- `features/products/domain`: product model and repository contract.
-- `features/products/data`: HTTP and mock repository implementations.
-- `features/products/presentation`: product page and UI logic.
-- `shared/components`: reusable table, avatar and header.
-- `core/http`: HTTP interceptor with structured logs and the Correlation ID pattern. Each request generates a UUID, sent as `X-Request-ID` and shared by its request, response and error logs.
-- `styles`: shared SCSS breakpoints and mixins. Colors are defined in `src/styles.scss`.
+- `features/products/domain`: modelo en camelCase, errores de dominio y contrato del repositorio.
+- `features/products/application`: ProductService, servicio que usan las páginas y los validadores.
+- `features/products/data`: repositorios HTTP y mock, DTOs de la API y conversores de productos y errores.
+- `features/products/presentation`: páginas y lógica de interfaz.
+- `shared/components`: tabla, avatar, encabezado y campos reutilizables.
+- `shared/forms`: integración con ControlValueAccessor y mensajes de validación compartidos.
+- `core/http`: interceptor con logs estructurados y el patrón Correlation ID. Cada petición genera un UUID que se envía en `X-Request-ID` y relaciona los logs de petición, respuesta y error.
+- `styles`: breakpoints y mixins de SCSS compartidos. Los colores están en `src/styles.scss`.
 
-Dependency injection selects the repository implementation, keeping the page independent of the data source.
+Las páginas usan ProductService. La inyección de dependencias selecciona el repositorio; los detalles HTTP y los campos snake_case de la API quedan en la capa de datos.
 
-## Tests
+## Pruebas
+
+Jest calcula la cobertura por defecto y exige un mínimo del 70% en sentencias, ramas, funciones y líneas. La ejecución falla si alguna métrica queda por debajo del mínimo.
 
 ```bash
 npm test -- --run-in-band --watch=false
 npm test -- --run-in-band --watch=false --coverage
 ```
 
-## Build
+## Compilación
 
 ```bash
 npm run build
 ```
 
-Output: `dist/bank-products`.
+Los archivos generados quedan en `dist/bank-products`.
 
-## Conventions
+## Convenciones
 
-SCSS classes follow BEM: `block__element--modifier`, for example `input-field__control--invalid`.
+Las clases SCSS siguen BEM: `bloque__elemento--modificador`, por ejemplo `input-field__control--invalid`.
 
-Use Conventional Commits, for example: `feat(products): add registration form` or `fix(table): correct mobile menu`.
+Los mensajes de commit siguen Conventional Commits, por ejemplo `feat(products): add registration form` o `fix(table): correct mobile menu`.
 
-Prettier formats the code. Husky runs it through lint-staged before each commit, formats staged files and blocks the commit if formatting fails.
+Prettier aplica el formato del código. Antes de cada commit, Husky ejecuta Prettier mediante lint-staged sobre los archivos preparados y bloquea el commit si el formato falla.
 
 ```bash
 npm run format
 npm run format:check
 ```
 
-## Pending
+## Pendientes
 
-Editing and deletion are pending implementation.
+Implementar la eliminación de productos.
