@@ -11,7 +11,7 @@
   </header>
 
   <!-- Tabla -->
-  <div class="data-table__scroll" cdkScrollable>
+  <div class="data-table__scroll" (scroll)="closeActions()">
     <table class="data-table__table">
       <!-- Encabezados -->
       <thead class="data-table__thead">
@@ -69,33 +69,31 @@
                 <td class="data-table__cell data-table__cell--actions">
                   <div class="data-table__action-wrapper">
                     <button
-                      cdkOverlayOrigin
-                      #actionOrigin="cdkOverlayOrigin"
+                      #actionTrigger
                       type="button"
                       class="data-table__action-button"
                       aria-label="Mostrar acciones"
+                      aria-haspopup="menu"
                       [attr.aria-expanded]="openedRow() === row"
-                      (click)="toggleActions(row)"
+                      (click)="toggleActions(row, actionTrigger)"
                     >
-                      <mat-icon>more_vert</mat-icon>
+                      <mat-icon aria-hidden="true">more_vert</mat-icon>
                     </button>
 
-                    <ng-template
-                      cdkConnectedOverlay
-                      [cdkConnectedOverlayOrigin]="actionOrigin"
-                      [cdkConnectedOverlayOpen]="openedRow() === row"
-                      [cdkConnectedOverlayPositions]="actionMenuPositions"
-                      [cdkConnectedOverlayViewportMargin]="8"
-                      [cdkConnectedOverlayPush]="true"
-                      [cdkConnectedOverlayHasBackdrop]="true"
-                      cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop"
-                      (backdropClick)="openedRow.set(null)"
-                      (overlayKeydown)="$event.key === 'Escape' && openedRow.set(null)"
-                    >
-                      <div class="data-table__action-menu">
+                    @if (openedRow() === row) {
+                      <div
+                        #actionMenu
+                        class="data-table__action-menu"
+                        role="menu"
+                        aria-label="Acciones del registro"
+                        [style.top.px]="menuPosition().top"
+                        [style.right.px]="menuPosition().right"
+                        (keydown)="onMenuKeydown($event)"
+                      >
                         @for (action of actions(); track action.label) {
                           <button
                             type="button"
+                            role="menuitem"
                             class="data-table__action-item"
                             [style.width]="action.width"
                             (click)="executeAction(action, row)"
@@ -103,7 +101,7 @@
                             @if (action.src) {
                               <img class="data-table__action-image" [src]="action.src" alt="" />
                             } @else if (action.icon) {
-                              <mat-icon class="data-table__action-icon">
+                              <mat-icon class="data-table__action-icon" aria-hidden="true">
                                 {{ action.icon }}
                               </mat-icon>
                             }
@@ -112,7 +110,7 @@
                           </button>
                         }
                       </div>
-                    </ng-template>
+                    }
                   </div>
                 </td>
               }
@@ -141,7 +139,7 @@
         <app-paginator
           [totalPages]="totalPages()"
           [(page)]="currentPage"
-          (pageChange)="openedRow.set(null)"
+          (pageChange)="closeActions()"
         />
       }
       <label class="data-table__page-size">

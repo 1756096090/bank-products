@@ -1,5 +1,4 @@
 import { Component, signal } from '@angular/core';
-import { OverlayContainer } from '@angular/cdk/overlay';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { DataTable } from './data-table';
@@ -64,7 +63,6 @@ describe('DataTable', () => {
   let fixture: ComponentFixture<TestHostComponent>;
   let host: TestHostComponent;
   let element: HTMLElement;
-  let overlayElement: HTMLElement;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -74,7 +72,6 @@ describe('DataTable', () => {
     fixture = TestBed.createComponent(TestHostComponent);
     host = fixture.componentInstance;
     element = fixture.nativeElement as HTMLElement;
-    overlayElement = TestBed.inject(OverlayContainer).getContainerElement();
 
     fixture.detectChanges();
   });
@@ -173,7 +170,7 @@ describe('DataTable', () => {
 
     fixture.detectChanges();
 
-    const menu = overlayElement.querySelector('.data-table__action-menu');
+    const menu = element.querySelector('.data-table__action-menu');
 
     expect(menu).not.toBeNull();
     expect(menu?.textContent).toContain('Editar');
@@ -188,13 +185,12 @@ describe('DataTable', () => {
     await fixture.whenStable();
 
     expect(button.getAttribute('aria-expanded')).toBe('true');
-    expect(overlayElement.querySelector('.data-table__action-menu')).not.toBeNull();
-    const backdrop = overlayElement.querySelector('.cdk-overlay-backdrop') as HTMLElement;
-    backdrop.click();
+    expect(element.querySelector('.data-table__action-menu')).not.toBeNull();
+    document.body.click();
     await fixture.whenStable();
 
     expect(button.getAttribute('aria-expanded')).toBe('false');
-    expect(overlayElement.querySelector('.data-table__action-menu')).toBeNull();
+    expect(element.querySelector('.data-table__action-menu')).toBeNull();
   });
 
   it('debe ejecutar Editar con el producto correcto', () => {
@@ -203,7 +199,7 @@ describe('DataTable', () => {
     menuButton.click();
     fixture.detectChanges();
 
-    const actionButtons = overlayElement.querySelectorAll('.data-table__action-item');
+    const actionButtons = element.querySelectorAll('.data-table__action-item');
 
     (actionButtons[0] as HTMLButtonElement).click();
 
@@ -212,7 +208,7 @@ describe('DataTable', () => {
     expect(host.editProduct).toHaveBeenCalledTimes(1);
     expect(host.editProduct).toHaveBeenCalledWith(host.products()[0]);
 
-    expect(overlayElement.querySelector('.data-table__action-menu')).toBeNull();
+    expect(element.querySelector('.data-table__action-menu')).toBeNull();
   });
 
   it('debe ejecutar Eliminar con el producto correcto', () => {
@@ -221,10 +217,132 @@ describe('DataTable', () => {
     menuButton.click();
     fixture.detectChanges();
 
-    const actionButtons = overlayElement.querySelectorAll('.data-table__action-item');
+    const actionButtons = element.querySelectorAll('.data-table__action-item');
 
     (actionButtons[1] as HTMLButtonElement).click();
 
     expect(host.deleteProduct).toHaveBeenCalledWith(host.products()[0]);
+  });
+
+  describe('menú de acciones', () => {
+    const triggers = () =>
+      element.querySelectorAll<HTMLButtonElement>('.data-table__action-button');
+    const menu = () => element.querySelector<HTMLElement>('.data-table__action-menu');
+    const items = () => element.querySelectorAll<HTMLButtonElement>('[role="menuitem"]');
+    const pressKey = (target: EventTarget, key: string) =>
+      target.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }));
+
+    async function openMenu(index = 0): Promise<HTMLButtonElement> {
+      const trigger = triggers()[index];
+      trigger.click();
+      await fixture.whenStable();
+      return trigger;
+    }
+
+    it('enfoca la primera opción al abrir y se cierra con Escape devolviendo el foco', async () => {
+      const trigger = await openMenu();
+
+      expect(menu()?.getAttribute('role')).toBe('menu');
+      expect(document.activeElement).toBe(items()[0]);
+
+      pressKey(document, 'Escape');
+      await fixture.whenStable();
+
+      expect(menu()).toBeNull();
+      expect(document.activeElement).toBe(trigger);
+    });
+
+    it('recorre las opciones con las flechas de forma circular', async () => {
+      await openMenu();
+
+      pressKey(items()[0], 'ArrowDown');
+      expect(document.activeElement).toBe(items()[1]);
+
+      pressKey(items()[1], 'ArrowDown');
+      expect(document.activeElement).toBe(items()[0]);
+
+      pressKey(items()[0], 'ArrowUp');
+      expect(document.activeElement).toBe(items()[1]);
+
+      pressKey(items()[1], 'Tab');
+      expect(document.activeElement).toBe(items()[1]);
+    });
+
+    it('se cierra al pulsar de nuevo el botón o al desplazar la tabla', async () => {
+      await openMenu();
+      triggers()[0].click();
+      await fixture.whenStable();
+      expect(menu()).toBeNull();
+
+      await openMenu();
+      element.querySelector('.data-table__scroll')?.dispatchEvent(new Event('scroll'));
+      await fixture.whenStable();
+      expect(menu()).toBeNull();
+    });
+
+    it('no se cierra al hacer clic dentro del menú y muestra uno solo a la vez', async () => {
+      await openMenu();
+      menu()?.click();
+      await fixture.whenStable();
+      expect(menu()).not.toBeNull();
+
+      await openMenu(1);
+      expect(element.querySelectorAll('.data-table__action-menu')).toHaveLength(1);
+      expect(triggers()[0].getAttribute('aria-expanded')).toBe('false');
+      expect(triggers()[1].getAttribute('aria-expanded')).toBe('true');
+    });
+
+    describe('posición', () => {
+      const originalInnerHeight = window.innerHeight;
+      const originalOffsetHeight = Object.getOwnPropertyDescriptor(
+        HTMLElement.prototype,
+        'offsetHeight',
+      ) as PropertyDescriptor;
+
+      function mockLayout(triggerTop: number, viewportHeight: number, menuHeight: number): void {
+        jest.spyOn(triggers()[0], 'getBoundingClientRect').mockReturnValue({
+          top: triggerTop,
+          bottom: triggerTop + 36,
+          right: 300,
+        } as DOMRect);
+        jest.spyOn(document.documentElement, 'clientWidth', 'get').mockReturnValue(400);
+        Object.defineProperty(window, 'innerHeight', { configurable: true, value: viewportHeight });
+        Object.defineProperty(HTMLElement.prototype, 'offsetHeight', {
+          configurable: true,
+          get: () => menuHeight,
+        });
+      }
+
+      afterEach(() => {
+        jest.restoreAllMocks();
+        Object.defineProperty(window, 'innerHeight', {
+          configurable: true,
+          value: originalInnerHeight,
+        });
+        Object.defineProperty(HTMLElement.prototype, 'offsetHeight', originalOffsetHeight);
+      });
+
+      it('se abre debajo del botón, alineado a su borde derecho', async () => {
+        mockLayout(100, 800, 80);
+        await openMenu();
+
+        expect(menu()?.style.top).toBe('140px');
+        expect(menu()?.style.right).toBe('100px');
+      });
+
+      it('se abre hacia arriba cuando no cabe debajo', async () => {
+        mockLayout(700, 800, 80);
+        await openMenu();
+
+        expect(menu()?.style.top).toBe('616px');
+      });
+
+      it('se ajusta al borde de la ventana si no cabe ni arriba ni abajo', async () => {
+        mockLayout(20, 100, 80);
+        await openMenu();
+
+        expect(menu()?.style.top).toBe('12px');
+      });
+    });
   });
 });
