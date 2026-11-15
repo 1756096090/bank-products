@@ -1,0 +1,20 @@
+<div
+  class="image-avatar"
+  [class.image-avatar--fallback]="!showImage()"
+  [style.width]="showImage() ? null : height()"
+  [style.max-width]="maxWidth()"
+  [style.height]="height()"
+>
+  @if (showImage()) {
+    <img
+      class="image-avatar__image"
+      [src]="src()"
+      [alt]="alt()"
+      (error)="onImageError()"
+    />
+  } @else {
+    <span class="image-avatar__fallback">
+      {{ fallback() }}
+    </span>
+  }
+</div>

@@ -1,1 +1,56 @@
-/* You can add global styles to this file, and also import other style files */
+// Tema de Angular Material.
+@use '@angular/material' as mat;
+@use '@angular/cdk/overlay-prebuilt.css';
+
+html {
+  height: 100%;
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$azure-palette,
+        tertiary: mat.$blue-palette,
+      ),
+      typography: Roboto,
+      density: 0,
+    )
+  );
+}
+
+body {
+  // Tema claro.
+  color-scheme: light;
+
+  // Estilos base.
+  background-color: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-medium);
+
+  // Sin margen exterior.
+  margin: 0;
+  height: 100%;
+}
+// Colores de la aplicación.
+
+:root {
+  --color-error: var(--mat-sys-error);
+  --color-surface: #ffffff;
+  --color-avatar-background: #c6ccda;
+  --color-avatar-text: var(--color-surface);
+  --color-text-primary: #2c3444;
+  --color-brand: #243b70;
+  --color-surface-table-header: #f4f5f8;
+  --color-text-heading: #2e3646;
+  --color-border: #e5e8ee;
+  --color-text-body: #454d5b;
+  --color-text-muted: #667085;
+  --color-transparent: transparent;
+  --color-text-secondary: #4b5563;
+  --color-surface-action-hover: #f1f3f7;
+  --color-focus: #203667;
+  --color-border-menu: #e5e8ef;
+  --color-shadow: rgb(0 0 0 / 12%);
+  --color-text-control: #344054;
+  --color-surface-menu-hover: #f5f6fa;
+  --color-border-control: #c8cbd1;
+  --color-background: #f5f6f9;
+}
