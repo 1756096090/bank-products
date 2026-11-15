@@ -6,7 +6,7 @@ import {
   input,
   linkedSignal,
   model,
-  signal
+  signal,
 } from '@angular/core';
 
 import { NgTemplateOutlet } from '@angular/common';
@@ -24,18 +24,15 @@ import { Paginator } from '../paginator/paginator';
   imports: [NgTemplateOutlet, MatIconModule, OverlayModule, ScrollingModule, Paginator],
   templateUrl: './data-table.html',
   styleUrl: './data-table.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DataTable<T extends object> {
-
   readonly columns = input.required<readonly TableColumn<T>[]>();
   readonly rows = input.required<readonly T[]>();
   readonly errorMessage = input<string | null>(null);
   readonly actions = input<readonly TableAction<T>[]>([]);
 
-  readonly pageSizeOptions = input<readonly number[]>([
-    5, 10, 15, 20, 30
-  ]);
+  readonly pageSizeOptions = input<readonly number[]>([5, 10, 15, 20, 30]);
 
   readonly pageSize = model(5);
 
@@ -43,14 +40,14 @@ export class DataTable<T extends object> {
 
   readonly actionMenuPositions: ConnectedPosition[] = [
     { originX: 'end', originY: 'bottom', overlayX: 'end', overlayY: 'top', offsetY: 4 },
-    { originX: 'end', originY: 'top', overlayX: 'end', overlayY: 'bottom', offsetY: -4 }
+    { originX: 'end', originY: 'top', overlayX: 'end', overlayY: 'bottom', offsetY: -4 },
   ];
 
   readonly total = computed(() => this.rows().length);
   readonly totalPages = computed(() => Math.max(1, Math.ceil(this.total() / this.pageSize())));
   readonly currentPage = linkedSignal({
     source: () => ({ rows: this.rows(), pageSize: this.pageSize() }),
-    computation: () => 1
+    computation: () => 1,
   });
 
   readonly visibleRows = computed(() => {
@@ -62,9 +59,7 @@ export class DataTable<T extends object> {
   readonly cellTemplates = contentChildren(TableCellDirective);
 
   getCellTemplate(key: string): TableCellDirective | undefined {
-    return this.cellTemplates().find(
-      template => template.tableCell() === key
-    );
+    return this.cellTemplates().find((template) => template.tableCell() === key);
   }
 
   onPageSizeChange(event: Event): void {
@@ -75,9 +70,7 @@ export class DataTable<T extends object> {
   }
 
   toggleActions(row: T): void {
-    this.openedRow.update(current =>
-      current === row ? null : row
-    );
+    this.openedRow.update((current) => (current === row ? null : row));
   }
 
   executeAction(action: TableAction<T>, row: T): void {

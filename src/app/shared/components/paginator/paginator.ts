@@ -6,7 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
   imports: [MatIconModule],
   templateUrl: './paginator.html',
   styleUrl: './paginator.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Paginator {
   readonly totalPages = input.required<number>();

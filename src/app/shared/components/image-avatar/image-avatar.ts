@@ -1,19 +1,12 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  input,
-  signal
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, signal } from '@angular/core';
 
 @Component({
   selector: 'app-image-avatar',
   templateUrl: './image-avatar.html',
   styleUrl: './image-avatar.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ImageAvatar {
-
   readonly src = input<string | null | undefined>();
   readonly alt = input('');
   readonly fallback = input('JG');

@@ -1,7 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { App } from './app';
 
-
 it('should render bank header', async () => {
   const fixture = TestBed.createComponent(App);
 

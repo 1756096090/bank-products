@@ -1,12 +1,7 @@
-import {
-  Directive,
-  TemplateRef,
-  inject,
-  input
-} from '@angular/core';
+import { Directive, TemplateRef, inject, input } from '@angular/core';
 
 @Directive({
-  selector: 'ng-template[tableCell]'
+  selector: 'ng-template[tableCell]',
 })
 export class TableCellDirective {
   readonly tableCell = input.required<string>();

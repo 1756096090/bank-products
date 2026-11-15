@@ -17,7 +17,9 @@ describe('Paginator', () => {
     expect(fixture.componentInstance.visiblePages()).toEqual([1, 2, 3]);
     expect(element.querySelector('[aria-current="page"]')?.textContent?.trim()).toBe('1');
     expect(element.textContent).toContain('…');
-    expect((element.querySelector('[aria-label="Página anterior"]') as HTMLButtonElement).disabled).toBe(true);
+    expect(
+      (element.querySelector('[aria-label="Página anterior"]') as HTMLButtonElement).disabled,
+    ).toBe(true);
   });
 
   it('avanza y retrocede notificando la página seleccionada', async () => {
@@ -42,7 +44,9 @@ describe('Paginator', () => {
     fixture.componentRef.setInput('page', 8);
     await fixture.whenStable();
     expect(fixture.componentInstance.visiblePages()).toEqual([6, 7, 8]);
-    expect((element.querySelector('[aria-label="Página siguiente"]') as HTMLButtonElement).disabled).toBe(true);
+    expect(
+      (element.querySelector('[aria-label="Página siguiente"]') as HTMLButtonElement).disabled,
+    ).toBe(true);
     fixture.componentInstance.goTo(9);
     expect(fixture.componentInstance.page()).toBe(8);
   });

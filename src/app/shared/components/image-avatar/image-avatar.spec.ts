@@ -20,14 +20,17 @@ describe('ImageAvatar', () => {
     expect(component).toBeTruthy();
   });
 
-  it.each([undefined, null, MOCK_PRODUCTS[1].logo])('debe mostrar JG sin imagen (%s)', async src => {
-    fixture.componentRef.setInput('src', src);
-    await fixture.whenStable();
+  it.each([undefined, null, MOCK_PRODUCTS[1].logo])(
+    'debe mostrar JG sin imagen (%s)',
+    async (src) => {
+      fixture.componentRef.setInput('src', src);
+      await fixture.whenStable();
 
-    expect(fixture.nativeElement.querySelector('img')).toBeNull();
-    expect(fixture.nativeElement.querySelector('.image-avatar--fallback')).not.toBeNull();
-    expect(fixture.nativeElement.textContent.trim()).toBe('JG');
-  });
+      expect(fixture.nativeElement.querySelector('img')).toBeNull();
+      expect(fixture.nativeElement.querySelector('.image-avatar--fallback')).not.toBeNull();
+      expect(fixture.nativeElement.textContent.trim()).toBe('JG');
+    },
+  );
 
   it('debe mostrar el logo y el nombre del producto sin círculo', async () => {
     fixture.componentRef.setInput('src', MOCK_PRODUCTS[0].logo);

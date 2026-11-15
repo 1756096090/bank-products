@@ -15,9 +15,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptors([loggingInterceptor])),
     {
       provide: PRODUCT_REPOSITORY,
-      useClass: environment.useMocks
-        ? MockProductRepository
-        : HttpProductRepository
-    }
-  ]
+      useClass: environment.useMocks ? MockProductRepository : HttpProductRepository,
+    },
+  ],
 };

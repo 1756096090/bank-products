@@ -1,5 +1,10 @@
 <nav class="paginator" aria-label="Páginas de productos">
-  <button type="button" aria-label="Página anterior" [disabled]="page() <= 1" (click)="goTo(page() - 1)">
+  <button
+    type="button"
+    aria-label="Página anterior"
+    [disabled]="page() <= 1"
+    (click)="goTo(page() - 1)"
+  >
     <mat-icon aria-hidden="true">chevron_left</mat-icon>
   </button>
 
@@ -8,8 +13,12 @@
   }
 
   @for (number of visiblePages(); track number) {
-    <button type="button" [attr.aria-label]="'Página ' + number"
-      [attr.aria-current]="number === page() ? 'page' : null" (click)="goTo(number)">
+    <button
+      type="button"
+      [attr.aria-label]="'Página ' + number"
+      [attr.aria-current]="number === page() ? 'page' : null"
+      (click)="goTo(number)"
+    >
       {{ number }}
     </button>
   }
@@ -18,8 +27,12 @@
     <span aria-hidden="true">…</span>
   }
 
-  <button type="button" aria-label="Página siguiente" [disabled]="page() >= totalPages()"
-    (click)="goTo(page() + 1)">
+  <button
+    type="button"
+    aria-label="Página siguiente"
+    [disabled]="page() >= totalPages()"
+    (click)="goTo(page() + 1)"
+  >
     <mat-icon aria-hidden="true">chevron_right</mat-icon>
   </button>
 </nav>

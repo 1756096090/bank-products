@@ -4,7 +4,7 @@ import { CustomButton } from './custom-button';
 
 @Component({
   imports: [CustomButton],
-  template: '<app-custom-button (clicked)="onClick()">Agregar</app-custom-button>'
+  template: '<app-custom-button (clicked)="onClick()">Agregar</app-custom-button>',
 })
 class ButtonHost {
   readonly onClick = jest.fn();
@@ -15,7 +15,9 @@ describe('CustomButton', () => {
   let button: HTMLButtonElement;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({ imports: [CustomButton, ButtonHost] }).compileComponents();
+    await TestBed.configureTestingModule({
+      imports: [CustomButton, ButtonHost],
+    }).compileComponents();
     fixture = TestBed.createComponent(CustomButton);
     await fixture.whenStable();
     button = fixture.nativeElement.querySelector('button');
@@ -34,7 +36,7 @@ describe('CustomButton', () => {
     expect(button.classList.contains('custom-button--primary')).toBe(false);
   });
 
-  it.each(['submit', 'reset'])('respeta el tipo %s', async type => {
+  it.each(['submit', 'reset'])('respeta el tipo %s', async (type) => {
     fixture.componentRef.setInput('type', type);
     await fixture.whenStable();
     expect(button.type).toBe(type);

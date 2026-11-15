@@ -6,12 +6,7 @@
   [style.height]="height()"
 >
   @if (showImage()) {
-    <img
-      class="image-avatar__image"
-      [src]="src()"
-      [alt]="alt()"
-      (error)="onImageError()"
-    />
+    <img class="image-avatar__image" [src]="src()" [alt]="alt()" (error)="onImageError()" />
   } @else {
     <span class="image-avatar__fallback">
       {{ fallback() }}
