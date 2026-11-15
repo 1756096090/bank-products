@@ -17,21 +17,19 @@ html {
 }
 
 body {
-  // Tema claro.
   color-scheme: light;
 
-  // Estilos base.
   background-color: var(--mat-sys-surface);
   color: var(--mat-sys-on-surface);
   font: var(--mat-sys-body-medium);
 
-  // Sin margen exterior.
   margin: 0;
   height: 100%;
 }
 // Colores de la aplicación.
 
 :root {
+  --color-field-error: #c34848;
   --color-input-border: #d0d5dd;
   --color-text-placeholder: #98a2b3;
   --color-input-focus: #344d85;
@@ -41,9 +39,6 @@ body {
   --color-button-primary-hover: #f7d94e;
   --color-button-secondary: #e9ecf3;
   --color-button-secondary-hover: #dce1eb;
-  --color-button-add: #f9e66c;
-  --color-button-add-text: #24335a;
-  --color-button-add-hover: #f1d943;
 
   --color-error: var(--mat-sys-error);
   --color-surface: #ffffff;

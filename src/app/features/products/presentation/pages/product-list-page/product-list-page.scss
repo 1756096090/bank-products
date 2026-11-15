@@ -1,13 +1,13 @@
+@use '../../../../../../styles/breakpoints';
+@use '../../../../../../styles/mixins';
+
 :host {
   display: block;
   min-width: 0;
 }
 
 .product-list-page {
-  min-height: calc(100vh - 80px);
-  padding: 64px 24px;
-  background-color: var(--color-background);
-  box-sizing: border-box;
+  @include mixins.page-layout(64px 24px);
 
   &__container {
     width: 100%;
@@ -36,7 +36,7 @@
     justify-content: flex-end;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: breakpoints.$tablet) {
     padding: 24px 12px;
 
     &__search {
@@ -44,7 +44,7 @@
     }
   }
 
-  @media (max-width: 480px) {
+  @media (max-width: breakpoints.$mobile) {
     &__toolbar {
       flex-direction: column;
       align-items: stretch;

@@ -1,3 +1,6 @@
+@use '../../../../styles/breakpoints';
+@use '../../../../styles/mixins';
+
 :host {
   display: block;
   width: 100%;
@@ -104,14 +107,6 @@
     gap: 10px;
     padding: 36px 16px;
     color: var(--color-error);
-
-    .mat-icon {
-      flex-shrink: 0;
-    }
-  }
-
-  &__action-wrapper {
-    display: inline-block;
   }
 
   &__action-button {
@@ -128,10 +123,7 @@
     cursor: pointer;
 
     .mat-icon {
-      width: 24px;
-      height: 24px;
-      font-size: 24px;
-      line-height: 24px;
+      @include mixins.icon-size(24px);
       flex-shrink: 0;
     }
 
@@ -202,7 +194,6 @@
   }
 
   &__results {
-    flex-wrap: wrap;
     color: var(--color-text-secondary);
     font-size: 13px;
   }
@@ -210,6 +201,7 @@
   &__pagination {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: 12px;
   }
 
@@ -262,8 +254,8 @@
     border: 0;
   }
 
-  // Responsive
-  @media (max-width: 768px) {
+  // Móviles
+  @media (max-width: breakpoints.$tablet) {
     padding: 12px;
 
     &__header {

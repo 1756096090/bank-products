@@ -1,4 +1,8 @@
-:host { display: block; }
+@use '../../../../styles/mixins';
+
+:host {
+  display: block;
+}
 
 .paginator {
   display: flex;
@@ -21,15 +25,25 @@
     font-size: 13px;
     cursor: pointer;
 
-    &:hover:not(:disabled) { background: var(--color-surface-action-hover); }
+    &:hover:not(:disabled) {
+      background: var(--color-surface-action-hover);
+    }
     &[aria-current='page'] {
       background: var(--color-brand);
       border-color: var(--color-brand);
       color: var(--color-surface);
     }
-    &:disabled { opacity: 0.4; cursor: not-allowed; }
-    &:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    &:focus-visible {
+      outline: 2px solid var(--color-focus);
+      outline-offset: 2px;
+    }
   }
 
-  mat-icon { width: 20px; height: 20px; font-size: 20px; line-height: 20px; }
+  mat-icon {
+    @include mixins.icon-size(20px);
+  }
 }

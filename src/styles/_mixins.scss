@@ -1,0 +1,13 @@
+@mixin page-layout($padding) {
+  min-height: calc(100vh - 80px);
+  padding: $padding;
+  box-sizing: border-box;
+  background-color: var(--color-background);
+}
+
+@mixin icon-size($size) {
+  width: $size;
+  height: $size;
+  font-size: $size;
+  line-height: $size;
+}
