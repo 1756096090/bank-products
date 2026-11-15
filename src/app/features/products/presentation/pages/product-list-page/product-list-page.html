@@ -1,11 +1,7 @@
-
 <section class="product-list-page">
-
   <div class="product-list-page__container">
-
     <!-- Barra superior -->
     <div class="product-list-page__toolbar">
-
       <!-- Buscador -->
       <div class="product-list-page__search">
         <app-input-field
@@ -17,14 +13,10 @@
 
       <!-- Agregar -->
       <div class="product-list-page__add">
-        <app-custom-button
-          variant="primary"
-          [disabled]="!canAddProduct()"
-        >
+        <app-custom-button variant="primary" routerLink="/products/new">
           Agregar
         </app-custom-button>
       </div>
-
     </div>
 
     <!-- Tabla -->
@@ -36,7 +28,6 @@
       [pageSizeOptions]="[5, 10, 20]"
       [pageSize]="5"
     >
-
       <!-- Logo -->
       <ng-template tableCell="logo" let-product>
         <app-image-avatar
@@ -50,16 +41,13 @@
 
       <!-- Fecha de liberación -->
       <ng-template tableCell="date_release" let-product>
-        {{ product.date_release | date:'dd/MM/yyyy':'UTC' }}
+        {{ product.date_release | date: 'dd/MM/yyyy' : 'UTC' }}
       </ng-template>
 
       <!-- Fecha de reestructuración -->
       <ng-template tableCell="date_revision" let-product>
-        {{ product.date_revision | date:'dd/MM/yyyy':'UTC' }}
+        {{ product.date_revision | date: 'dd/MM/yyyy' : 'UTC' }}
       </ng-template>
-
     </app-data-table>
-
   </div>
-
 </section>

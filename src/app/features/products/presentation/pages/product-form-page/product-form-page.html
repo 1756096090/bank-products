@@ -1,0 +1,92 @@
+<section class="product-form-page">
+  <div class="product-form-page__card">
+    <header>
+      <h1>Formulario de Registro</h1>
+    </header>
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <div class="product-form-page__fields">
+        <div>
+          <app-input-field
+            label="ID"
+            placeholder=""
+            hint="De 3 a 10 caracteres"
+            [required]="true"
+            [value]="form.controls.id.value"
+            (valueChange)="setField('id', $event)"
+            (blurred)="form.controls.id.markAsTouched()"
+            [error]="errorFor('id')"
+            [disabled]="saving()"
+          />
+          @if (form.controls.id.pending) {
+            <p role="status">Verificando ID…</p>
+          }
+          @if (form.controls.id.hasError('verificationFailed')) {
+            <button type="button" class="product-form-page__retry" (click)="retryVerification()">
+              Verificar de nuevo
+            </button>
+          }
+        </div>
+        <app-input-field
+          label="Nombre"
+          placeholder=""
+          hint="De 5 a 100 caracteres"
+          [required]="true"
+          [value]="form.controls.name.value"
+          (valueChange)="setField('name', $event)"
+          (blurred)="form.controls.name.markAsTouched()"
+          [error]="errorFor('name')"
+          [disabled]="saving()"
+        />
+        <app-input-field
+          label="Descripción"
+          placeholder=""
+          hint="De 10 a 200 caracteres"
+          [required]="true"
+          [value]="form.controls.description.value"
+          (valueChange)="setField('description', $event)"
+          (blurred)="form.controls.description.markAsTouched()"
+          [error]="errorFor('description')"
+          [disabled]="saving()"
+        />
+        <app-input-field
+          label="Logo"
+          placeholder=""
+          hint="URL de la imagen del producto"
+          [required]="true"
+          [value]="form.controls.logo.value"
+          (valueChange)="setField('logo', $event)"
+          (blurred)="form.controls.logo.markAsTouched()"
+          [error]="errorFor('logo')"
+          [disabled]="saving()"
+        />
+        <app-input-date
+          label="Fecha Liberación"
+          [required]="true"
+          [min]="today"
+          [value]="form.controls.date_release.value"
+          (valueChange)="setField('date_release', $event)"
+          (blurred)="form.controls.date_release.markAsTouched()"
+          [error]="errorFor('date_release')"
+          [disabled]="saving()"
+        />
+        <app-input-date
+          label="Fecha Revisión"
+          hint="Un año después de la liberación"
+          [disabled]="true"
+          [value]="form.controls.date_revision.value"
+        />
+      </div>
+      @if (serviceError()) {
+        <p class="product-form-page__error" role="alert">{{ serviceError() }}</p>
+      }
+      <div class="product-form-page__actions">
+        <app-custom-button variant="secondary" [disabled]="saving()" (clicked)="reset()"
+          >Reiniciar</app-custom-button
+        >
+        <app-custom-button type="submit" [disabled]="!canSubmit()">{{
+          saving() ? 'Guardando…' : 'Enviar'
+        }}</app-custom-button>
+      </div>
+    </form>
+  </div>
+</section>

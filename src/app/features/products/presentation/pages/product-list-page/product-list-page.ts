@@ -1,12 +1,7 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  inject,
-  signal
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 
 import { DatePipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { catchError, of } from 'rxjs';
@@ -26,7 +21,6 @@ import { TableAction } from '../../../../../shared/components/data-table/models/
 import { Product } from '../../../domain/models/product.model';
 import { PRODUCT_REPOSITORY } from '../../../domain/repositories/product-repository.token';
 
-
 @Component({
   selector: 'app-product-list-page',
   imports: [
@@ -34,23 +28,20 @@ import { PRODUCT_REPOSITORY } from '../../../domain/repositories/product-reposit
     ImageAvatar,
     InputField,
     CustomButton,
+    RouterLink,
     TableCellDirective,
-    DatePipe
+    DatePipe,
   ],
   templateUrl: './product-list-page.html',
   styleUrl: './product-list-page.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductListPage {
-
   private readonly productRepository = inject(PRODUCT_REPOSITORY);
 
   // Estado
   readonly loadError = signal<string | null>(null);
   readonly searchTerm = signal('');
-
-  // TODO: Implementar la creación de productos.
-  readonly canAddProduct = signal(false);
 
   // Columnas
   readonly columns: TableColumn<Product>[] = [
@@ -58,7 +49,7 @@ export class ProductListPage {
     { key: 'name', header: 'Nombre del producto', width: '22%' },
     { key: 'description', header: 'Descripción', width: '28%' },
     { key: 'date_release', header: 'Fecha de liberación', width: '19%' },
-    { key: 'date_revision', header: 'Fecha de reestructuración', width: '19%' }
+    { key: 'date_revision', header: 'Fecha de reestructuración', width: '19%' },
   ];
 
   // Acciones
@@ -66,13 +57,13 @@ export class ProductListPage {
     {
       label: 'Editar',
       icon: 'edit',
-      execute: (product) => this.editProduct(product)
+      execute: (product) => this.editProduct(product),
     },
     {
       label: 'Eliminar',
       icon: 'delete',
-      execute: (product) => this.deleteProduct(product)
-    }
+      execute: (product) => this.deleteProduct(product),
+    },
   ];
 
   // Productos
@@ -81,9 +72,9 @@ export class ProductListPage {
       catchError((error: unknown) => {
         this.loadError.set(this.getErrorMessage(error));
         return of([] as Product[]);
-      })
+      }),
     ),
-    { initialValue: [] as Product[] }
+    { initialValue: [] as Product[] },
   );
 
   // Filtro de búsqueda
@@ -94,10 +85,11 @@ export class ProductListPage {
       return this.products();
     }
 
-    return this.products().filter(product =>
-      product.name.toLowerCase().includes(search) ||
-      product.description.toLowerCase().includes(search) ||
-      product.id.toLowerCase().includes(search)
+    return this.products().filter(
+      (product) =>
+        product.name.toLowerCase().includes(search) ||
+        product.description.toLowerCase().includes(search) ||
+        product.id.toLowerCase().includes(search),
     );
   });
 

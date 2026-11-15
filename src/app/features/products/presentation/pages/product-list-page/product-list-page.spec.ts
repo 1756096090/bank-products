@@ -4,6 +4,7 @@ import { of, throwError } from 'rxjs';
 import { PRODUCT_REPOSITORY } from '../../../domain/repositories/product-repository.token';
 import { MOCK_PRODUCTS } from '../../../data/mocks/products.mock';
 import { HttpErrorResponse } from '@angular/common/http';
+import { provideRouter } from '@angular/router';
 
 describe('ProductListPage', () => {
   let component: ProductListPage;
@@ -14,7 +15,7 @@ describe('ProductListPage', () => {
     repository.getAll.mockReturnValue(of(MOCK_PRODUCTS));
     await TestBed.configureTestingModule({
       imports: [ProductListPage],
-      providers: [{ provide: PRODUCT_REPOSITORY, useValue: repository }],
+      providers: [provideRouter([]), { provide: PRODUCT_REPOSITORY, useValue: repository }],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ProductListPage);
@@ -31,7 +32,7 @@ describe('ProductListPage', () => {
     ['gestionar', [MOCK_PRODUCTS[1]]],
     ['save-001', [MOCK_PRODUCTS[1]]],
     ['   ', MOCK_PRODUCTS],
-    ['sin coincidencias', []]
+    ['sin coincidencias', []],
   ])('filtra desde el buscador con "%s"', async (term, expected) => {
     const input = fixture.nativeElement.querySelector('app-input-field input') as HTMLInputElement;
     input.value = term;
@@ -40,15 +41,16 @@ describe('ProductListPage', () => {
 
     expect(component.filteredProducts()).toEqual(expected);
     expect(component.products()).toEqual(MOCK_PRODUCTS);
-    expect(fixture.nativeElement.querySelector('.data-table__results').textContent)
-      .toContain(`${expected.length} Resultados`);
+    expect(fixture.nativeElement.querySelector('.data-table__results').textContent).toContain(
+      `${expected.length} Resultados`,
+    );
     if (!expected.length) {
       expect(fixture.nativeElement.querySelector('.data-table__empty')).not.toBeNull();
     }
   });
 
-  it('mantiene deshabilitado Agregar mientras está pendiente', () => {
-    expect(fixture.nativeElement.querySelector('app-custom-button button').disabled).toBe(true);
+  it('habilita Agregar para abrir el registro', () => {
+    expect(fixture.nativeElement.querySelector('app-custom-button button').disabled).toBe(false);
   });
 
   it('should display products from the repository', () => {
@@ -62,28 +64,35 @@ describe('ProductListPage', () => {
       repository.getAll.mockReturnValue(throwError(() => new Error('API unavailable')));
       const failedFixture = TestBed.createComponent(ProductListPage);
       await failedFixture.whenStable();
-      expect(failedFixture.nativeElement.querySelector('[role="alert"]').textContent)
-        .toContain('Error de servicio');
+      expect(failedFixture.nativeElement.querySelector('[role="alert"]').textContent).toContain(
+        'Error de servicio',
+      );
     } finally {
       consoleSpy.mockRestore();
     }
   });
 
-  it.each([400, 401, 403, 404, 500, 503])('muestra el error HTTP %s dentro de la tabla', async status => {
-    repository.getAll.mockReturnValue(throwError(() => new HttpErrorResponse({ status })));
-    const failedFixture = TestBed.createComponent(ProductListPage);
-    await failedFixture.whenStable();
-    const element = failedFixture.nativeElement as HTMLElement;
-    expect(element.querySelector('tbody [role="alert"]')?.textContent).toContain(`Error de servicio ${status}`);
-    expect(element.querySelector('tbody mat-icon')).not.toBeNull();
-    expect(element.querySelector('.data-table__empty')).toBeNull();
-  });
+  it.each([400, 401, 403, 404, 500, 503])(
+    'muestra el error HTTP %s dentro de la tabla',
+    async (status) => {
+      repository.getAll.mockReturnValue(throwError(() => new HttpErrorResponse({ status })));
+      const failedFixture = TestBed.createComponent(ProductListPage);
+      await failedFixture.whenStable();
+      const element = failedFixture.nativeElement as HTMLElement;
+      expect(element.querySelector('tbody [role="alert"]')?.textContent).toContain(
+        `Error de servicio ${status}`,
+      );
+      expect(element.querySelector('tbody mat-icon')).not.toBeNull();
+      expect(element.querySelector('.data-table__empty')).toBeNull();
+    },
+  );
 
   it('distingue un error de conexión de una lista vacía', async () => {
     repository.getAll.mockReturnValue(throwError(() => new HttpErrorResponse({ status: 0 })));
     const failedFixture = TestBed.createComponent(ProductListPage);
     await failedFixture.whenStable();
-    expect(failedFixture.nativeElement.querySelector('[role="alert"]').textContent)
-      .toContain('Error de conexión');
+    expect(failedFixture.nativeElement.querySelector('[role="alert"]').textContent).toContain(
+      'Error de conexión',
+    );
   });
 });
