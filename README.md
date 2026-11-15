@@ -65,6 +65,6 @@ npm run format
 npm run format:check
 ```
 
-## Pendientes
+## Funcionalidades
 
-Implementar la eliminación de productos.
+Listado con búsqueda y paginación, registro, edición por ID en la URL y eliminación con confirmación.

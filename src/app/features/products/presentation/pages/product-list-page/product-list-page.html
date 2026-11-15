@@ -51,3 +51,13 @@
     </app-data-table>
   </div>
 </section>
+
+<app-confirmation-dialog
+  [open]="!!productToDelete()"
+  [title]="deleteTitle()"
+  [busy]="deleting()"
+  [error]="deleteError()"
+  pendingLabel="Eliminando…"
+  (cancelled)="cancelDelete()"
+  (confirmed)="confirmDelete()"
+/>

@@ -7,4 +7,5 @@ export interface ProductRepository {
   exists(id: string): Observable<boolean>;
   create(product: Product): Observable<Product>;
   update(id: string, product: Product): Observable<Product>;
+  delete(id: string): Observable<void>;
 }

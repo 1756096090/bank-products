@@ -1,10 +1,18 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 
 import { DatePipe } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 
-import { toSignal } from '@angular/core/rxjs-interop';
-import { catchError, of } from 'rxjs';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { catchError, finalize, of } from 'rxjs';
+import { ConfirmationDialog } from '../../../../../shared/components/confirmation-dialog/confirmation-dialog';
 
 // Componentes
 import { DataTable } from '../../../../../shared/components/data-table/data-table';
@@ -31,6 +39,7 @@ import { ProductService } from '../../../application/product.service';
     RouterLink,
     TableCellDirective,
     DatePipe,
+    ConfirmationDialog,
   ],
   templateUrl: './product-list-page.html',
   styleUrl: './product-list-page.scss',
@@ -39,10 +48,18 @@ import { ProductService } from '../../../application/product.service';
 export class ProductListPage {
   private readonly productsService = inject(ProductService);
   private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly deletedIds = signal<ReadonlySet<string>>(new Set());
 
   // Estado
   readonly loadError = signal<string | null>(null);
   readonly searchTerm = signal('');
+  readonly productToDelete = signal<Product | null>(null);
+  readonly deleting = signal(false);
+  readonly deleteError = signal('');
+  readonly deleteTitle = computed(
+    () => `¿Estás seguro de eliminar el producto ${this.productToDelete()?.name ?? ''}?`,
+  );
 
   // Columnas
   readonly columns: TableColumn<Product>[] = [
@@ -68,7 +85,7 @@ export class ProductListPage {
   ];
 
   // Productos
-  readonly products = toSignal(
+  private readonly loadedProducts = toSignal(
     this.productsService.getAll().pipe(
       catchError((error: unknown) => {
         this.loadError.set(this.productsService.errorMessage(error, 'list'));
@@ -76,6 +93,9 @@ export class ProductListPage {
       }),
     ),
     { initialValue: [] as Product[] },
+  );
+  readonly products = computed(() =>
+    this.loadedProducts().filter((product) => !this.deletedIds().has(product.id)),
   );
 
   // Filtro de búsqueda
@@ -98,8 +118,36 @@ export class ProductListPage {
     void this.router.navigate(['/products', product.id, 'edit']);
   }
 
-  // TODO: Confirmar y eliminar el producto.
   deleteProduct(product: Product): void {
-    console.log('Eliminar:', product);
+    if (this.deleting()) return;
+    this.deleteError.set('');
+    this.productToDelete.set(product);
+  }
+
+  cancelDelete(): void {
+    if (this.deleting()) return;
+    this.productToDelete.set(null);
+    this.deleteError.set('');
+  }
+
+  confirmDelete(): void {
+    const product = this.productToDelete();
+    if (!product || this.deleting()) return;
+    this.deleting.set(true);
+    this.deleteError.set('');
+    this.productsService
+      .delete(product.id)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.deleting.set(false)),
+      )
+      .subscribe({
+        next: () => {
+          this.deletedIds.update((ids) => new Set([...ids, product.id]));
+          this.productToDelete.set(null);
+        },
+        error: (error: unknown) =>
+          this.deleteError.set(this.productsService.errorMessage(error, 'delete')),
+      });
   }
 }

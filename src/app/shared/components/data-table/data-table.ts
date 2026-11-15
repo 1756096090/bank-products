@@ -119,7 +119,7 @@ export class DataTable<T extends object> {
   }
 
   executeAction(action: TableAction<T>, row: T): void {
-    this.closeActions();
+    this.closeActions(true);
     action.execute(row);
   }
 

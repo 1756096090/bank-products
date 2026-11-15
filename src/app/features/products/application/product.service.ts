@@ -4,7 +4,7 @@ import { Product } from '../domain/models/product.model';
 import { PRODUCT_REPOSITORY } from '../domain/repositories/product-repository.token';
 import { ProductError } from '../domain/errors/product.error';
 
-type ProductOperation = 'list' | 'load' | 'save';
+type ProductOperation = 'list' | 'load' | 'save' | 'delete';
 
 @Injectable({ providedIn: 'root' })
 export class ProductService {
@@ -26,11 +26,16 @@ export class ProductService {
     return this.repository.update(id, { ...product, id });
   }
 
+  delete(id: string): Observable<void> {
+    return this.repository.delete(id);
+  }
+
   errorMessage(error: unknown, operation: ProductOperation): string {
     const action = {
       list: 'cargar los productos',
       load: 'cargar el producto',
       save: 'guardar el producto',
+      delete: 'eliminar el producto',
     }[operation];
     const failure = operation === 'list' ? 'no se pudieron' : 'no se pudo';
     if (error instanceof ProductError) {

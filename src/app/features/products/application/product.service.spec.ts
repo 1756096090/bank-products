@@ -13,6 +13,7 @@ describe('ProductService', () => {
     exists: jest.fn(),
     create: jest.fn(),
     update: jest.fn(),
+    delete: jest.fn(),
   };
 
   beforeEach(() => {
@@ -26,6 +27,7 @@ describe('ProductService', () => {
     repository.exists.mockReturnValue(of(true));
     repository.create.mockReturnValue(of(MOCK_PRODUCTS[0]));
     repository.update.mockReturnValue(of(MOCK_PRODUCTS[0]));
+    repository.delete.mockReturnValue(of(undefined));
   });
 
   it('expone las operaciones de productos a la presentación', async () => {
@@ -40,6 +42,14 @@ describe('ProductService', () => {
   it('preserva el ID de la URL al actualizar', async () => {
     await firstValueFrom(service.update('visa-001', { ...MOCK_PRODUCTS[0], id: 'alterado' }));
     expect(repository.update).toHaveBeenCalledWith('visa-001', MOCK_PRODUCTS[0]);
+  });
+
+  it('elimina por ID y presenta el error de servicio correspondiente', async () => {
+    await firstValueFrom(service.delete('visa-001'));
+    expect(repository.delete).toHaveBeenCalledWith('visa-001');
+    expect(service.errorMessage(new ProductError('service', 500), 'delete')).toBe(
+      'Error de servicio 500: no se pudo eliminar el producto.',
+    );
   });
 
   it('propaga errores de dominio y centraliza sus mensajes', async () => {

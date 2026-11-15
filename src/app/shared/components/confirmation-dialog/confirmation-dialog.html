@@ -1,0 +1,23 @@
+<dialog
+  #dialog
+  class="confirmation-dialog"
+  [attr.aria-labelledby]="titleId"
+  [attr.aria-busy]="busy()"
+  (cancel)="cancel($event)"
+  (click)="onBackdropClick($event)"
+>
+  <div class="confirmation-dialog__content">
+    <h2 [id]="titleId">{{ title() }}</h2>
+    @if (error()) {
+      <p class="confirmation-dialog__error" role="alert">{{ error() }}</p>
+    }
+  </div>
+  <div class="confirmation-dialog__actions">
+    <app-custom-button variant="secondary" [disabled]="busy()" (clicked)="cancel()"
+      >Cancelar</app-custom-button
+    >
+    <app-custom-button [disabled]="busy()" (clicked)="confirm()">{{
+      busy() ? pendingLabel() : 'Confirmar'
+    }}</app-custom-button>
+  </div>
+</dialog>

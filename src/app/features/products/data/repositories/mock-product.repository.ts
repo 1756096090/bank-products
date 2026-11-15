@@ -43,4 +43,14 @@ export class MockProductRepository implements ProductRepository {
       return of({ ...product });
     });
   }
+
+  delete(id: string): Observable<void> {
+    return defer(() => {
+      if (!this.products.some((product) => product.id === id)) {
+        return throwError(() => new ProductError('notFound', 404));
+      }
+      this.products = this.products.filter((product) => product.id !== id);
+      return of(undefined);
+    });
+  }
 }

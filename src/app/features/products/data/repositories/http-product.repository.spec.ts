@@ -77,4 +77,20 @@ describe('HttpProductRepository', () => {
     http.expectOne(url).flush({}, { status: 400, statusText: 'Bad Request' });
     expect(error).toHaveBeenCalledWith(expect.any(ProductError));
   });
+
+  it('elimina con DELETE usando el ID codificado y devuelve void', () => {
+    const next = jest.fn();
+    repository.delete('prod /001').subscribe(next);
+    const request = http.expectOne(`${url}/prod%20%2F001`);
+    expect(request.request.method).toBe('DELETE');
+    request.flush({ message: 'Product removed successfully' });
+    expect(next).toHaveBeenCalledWith(undefined);
+  });
+
+  it('traduce los errores HTTP de eliminación a errores de dominio', () => {
+    const error = jest.fn();
+    repository.delete('unknown').subscribe({ error });
+    http.expectOne(`${url}/unknown`).flush({}, { status: 404, statusText: 'Not Found' });
+    expect(error).toHaveBeenCalledWith(expect.objectContaining({ code: 'notFound', status: 404 }));
+  });
 });

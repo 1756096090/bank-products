@@ -53,4 +53,14 @@ describe('MockProductRepository', () => {
       code: 'duplicateId',
     });
   });
+
+  it('elimina un producto sin modificar los mocks originales', async () => {
+    await firstValueFrom(repository.delete(MOCK_PRODUCTS[0].id));
+    expect(await firstValueFrom(repository.exists(MOCK_PRODUCTS[0].id))).toBe(false);
+    expect(await firstValueFrom(repository.getAll())).toEqual([MOCK_PRODUCTS[1]]);
+    expect(MOCK_PRODUCTS).toHaveLength(2);
+    await expect(firstValueFrom(repository.delete(MOCK_PRODUCTS[0].id))).rejects.toMatchObject({
+      code: 'notFound',
+    });
+  });
 });

@@ -50,4 +50,11 @@ export class HttpProductRepository implements ProductRepository {
         handleProductError(),
       );
   }
+
+  delete(id: string): Observable<void> {
+    return this.http.delete<unknown>(`${this.url}/${encodeURIComponent(id)}`).pipe(
+      map(() => undefined),
+      handleProductError(),
+    );
+  }
 }
