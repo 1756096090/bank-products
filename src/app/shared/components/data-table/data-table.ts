@@ -4,6 +4,7 @@ import {
   computed,
   contentChildren,
   input,
+  linkedSignal,
   model,
   signal
 } from '@angular/core';
@@ -16,10 +17,11 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
 import { TableColumn } from './models/table-column.model';
 import { TableAction } from './models/table-action.model';
 import { TableCellDirective } from './table-cell.directive';
+import { Paginator } from '../paginator/paginator';
 
 @Component({
   selector: 'app-data-table',
-  imports: [NgTemplateOutlet, MatIconModule, OverlayModule, ScrollingModule],
+  imports: [NgTemplateOutlet, MatIconModule, OverlayModule, ScrollingModule, Paginator],
   templateUrl: './data-table.html',
   styleUrl: './data-table.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -45,10 +47,16 @@ export class DataTable<T extends object> {
   ];
 
   readonly total = computed(() => this.rows().length);
+  readonly totalPages = computed(() => Math.max(1, Math.ceil(this.total() / this.pageSize())));
+  readonly currentPage = linkedSignal({
+    source: () => ({ rows: this.rows(), pageSize: this.pageSize() }),
+    computation: () => 1
+  });
 
-  readonly visibleRows = computed(() =>
-    this.rows().slice(0, this.pageSize())
-  );
+  readonly visibleRows = computed(() => {
+    const start = (this.currentPage() - 1) * this.pageSize();
+    return this.rows().slice(start, start + this.pageSize());
+  });
 
   // Plantillas de celdas
   readonly cellTemplates = contentChildren(TableCellDirective);

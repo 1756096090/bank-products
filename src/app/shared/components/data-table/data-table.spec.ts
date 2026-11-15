@@ -91,6 +91,29 @@ describe('DataTable', () => {
     expect(table).not.toBeNull();
   });
 
+  it('muestra los registros de la última página y reinicia al filtrar', async () => {
+    const table = fixture.debugElement.children[0].componentInstance as DataTable<Product>;
+    (element.querySelector('[aria-label="Página 3"]') as HTMLButtonElement).click();
+    await fixture.whenStable();
+    expect(table.visibleRows()).toEqual(host.products().slice(10));
+    expect(element.querySelectorAll('.data-table__tbody .data-table__row')).toHaveLength(2);
+    host.products.set(host.products().slice(0, 2));
+    await fixture.whenStable();
+    expect(table.currentPage()).toBe(1);
+    expect(table.visibleRows()).toHaveLength(2);
+  });
+
+  it('vuelve a la primera página al cambiar el tamaño', async () => {
+    (element.querySelector('[aria-label="Página 2"]') as HTMLButtonElement).click();
+    await fixture.whenStable();
+    const select = element.querySelector('select') as HTMLSelectElement;
+    select.value = '10';
+    select.dispatchEvent(new Event('change'));
+    await fixture.whenStable();
+    expect(element.querySelector('[aria-current="page"]')?.textContent?.trim()).toBe('1');
+    expect(element.querySelectorAll('.data-table__tbody .data-table__row')).toHaveLength(10);
+  });
+
   it('debe mostrar los encabezados configurados', () => {
     const headers = element.querySelectorAll(
       '.data-table__th'

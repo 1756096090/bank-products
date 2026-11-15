@@ -1,0 +1,25 @@
+<nav class="paginator" aria-label="Páginas de productos">
+  <button type="button" aria-label="Página anterior" [disabled]="page() <= 1" (click)="goTo(page() - 1)">
+    <mat-icon aria-hidden="true">chevron_left</mat-icon>
+  </button>
+
+  @if (visiblePages()[0] > 1) {
+    <span aria-hidden="true">…</span>
+  }
+
+  @for (number of visiblePages(); track number) {
+    <button type="button" [attr.aria-label]="'Página ' + number"
+      [attr.aria-current]="number === page() ? 'page' : null" (click)="goTo(number)">
+      {{ number }}
+    </button>
+  }
+
+  @if (visiblePages()[visiblePages().length - 1] < totalPages()) {
+    <span aria-hidden="true">…</span>
+  }
+
+  <button type="button" aria-label="Página siguiente" [disabled]="page() >= totalPages()"
+    (click)="goTo(page() + 1)">
+    <mat-icon aria-hidden="true">chevron_right</mat-icon>
+  </button>
+</nav>

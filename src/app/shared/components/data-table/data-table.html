@@ -180,6 +180,10 @@
     <div class="data-table__pagination">
       <label class="data-table__page-size">
 
+      @if (total() > 0 && !errorMessage()) {
+        <app-paginator [totalPages]="totalPages()" [(page)]="currentPage"
+          (pageChange)="openedRow.set(null)" />
+      }
         <span class="data-table__sr-only">
           Registros por página
         </span>
