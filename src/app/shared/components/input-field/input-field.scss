@@ -1,0 +1,99 @@
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+.input-field {
+  position: relative;
+  width: 100%;
+
+  // Campo de texto
+  &__control {
+    width: 100%;
+    height: 42px;
+    padding: 0 14px;
+    box-sizing: border-box;
+
+    border: 1px solid var(--color-input-border);
+    border-radius: 5px;
+    outline: none;
+
+    background-color: var(--color-surface);
+    color: var(--color-text-control);
+    font-size: 14px;
+
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
+
+    &::placeholder {
+      color: var(--color-text-placeholder);
+    }
+
+    // Espacio para el icono
+    &--with-icon {
+      padding-right: 48px;
+    }
+
+    &:focus {
+      border-color: var(--color-input-focus);
+      box-shadow: 0 0 0 3px var(--color-input-focus-shadow);
+    }
+
+    &:disabled {
+      background-color: var(--color-surface-disabled);
+      color: var(--color-text-placeholder);
+      cursor: not-allowed;
+    }
+  }
+
+  // Botón del icono
+  &__icon-button {
+    position: absolute;
+    top: 50%;
+    right: 5px;
+    transform: translateY(-50%);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 36px;
+    height: 36px;
+    padding: 0;
+
+    border: none;
+    border-radius: 4px;
+    background-color: var(--color-transparent);
+    color: var(--color-text-muted);
+
+    cursor: pointer;
+
+    &:hover:not(:disabled) {
+      background-color: var(--color-surface-disabled);
+      color: var(--color-brand);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--color-input-focus);
+      outline-offset: 1px;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  // Ícono Material
+  &__icon-button mat-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 20px;
+    height: 20px;
+    font-size: 20px;
+  }
+}

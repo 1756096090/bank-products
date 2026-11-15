@@ -1,0 +1,10 @@
+<button
+  class="custom-button"
+  [class.custom-button--primary]="variant() === 'primary'"
+  [class.custom-button--secondary]="variant() === 'secondary'"
+  [type]="type()"
+  [disabled]="disabled()"
+  (click)="onClick()"
+>
+  <ng-content />
+</button>

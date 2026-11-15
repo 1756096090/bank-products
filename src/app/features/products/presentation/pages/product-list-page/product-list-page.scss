@@ -1,3 +1,8 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
 .product-list-page {
   min-height: calc(100vh - 80px);
   padding: 64px 24px;
@@ -7,10 +12,44 @@
   &__container {
     width: 100%;
     max-width: 1200px;
+    min-width: 0;
     margin: 0 auto;
+  }
+
+  &__toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  &__search {
+    flex: 1;
+    min-width: 0;
+    max-width: 320px;
+  }
+
+  &__add {
+    display: flex;
+    flex-shrink: 0;
+    justify-content: flex-end;
   }
 
   @media (max-width: 768px) {
     padding: 24px 12px;
+
+    &__search {
+      max-width: none;
+    }
+  }
+
+  @media (max-width: 480px) {
+    &__toolbar {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
   }
 }

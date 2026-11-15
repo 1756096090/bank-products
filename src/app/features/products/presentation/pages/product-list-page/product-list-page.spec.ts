@@ -26,6 +26,31 @@ describe('ProductListPage', () => {
     expect(component).toBeTruthy();
   });
 
+  it.each([
+    ['  VISA  ', [MOCK_PRODUCTS[0]]],
+    ['gestionar', [MOCK_PRODUCTS[1]]],
+    ['save-001', [MOCK_PRODUCTS[1]]],
+    ['   ', MOCK_PRODUCTS],
+    ['sin coincidencias', []]
+  ])('filtra desde el buscador con "%s"', async (term, expected) => {
+    const input = fixture.nativeElement.querySelector('app-input-field input') as HTMLInputElement;
+    input.value = term;
+    input.dispatchEvent(new Event('input'));
+    await fixture.whenStable();
+
+    expect(component.filteredProducts()).toEqual(expected);
+    expect(component.products()).toEqual(MOCK_PRODUCTS);
+    expect(fixture.nativeElement.querySelector('.data-table__results').textContent)
+      .toContain(`${expected.length} Resultados`);
+    if (!expected.length) {
+      expect(fixture.nativeElement.querySelector('.data-table__empty')).not.toBeNull();
+    }
+  });
+
+  it('mantiene deshabilitado Agregar mientras está pendiente', () => {
+    expect(fixture.nativeElement.querySelector('app-custom-button button').disabled).toBe(true);
+  });
+
   it('should display products from the repository', () => {
     expect(component.products()).toEqual(MOCK_PRODUCTS);
     expect(fixture.nativeElement.textContent).toContain(MOCK_PRODUCTS[0].name);

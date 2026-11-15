@@ -1,0 +1,57 @@
+:host {
+    display: inline-block;
+}
+
+.custom-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 48px;
+    padding: 12px 24px;
+
+    border: none;
+    border-radius: 6px;
+
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+
+    cursor: pointer;
+    transition:
+        background-color 0.2s ease,
+        opacity 0.2s ease;
+
+    // Botón principal
+    &--primary {
+        background-color: var(--color-button-primary);
+        color: var(--color-focus);
+
+        &:hover:not(:disabled) {
+            background-color: var(--color-button-primary-hover);
+        }
+    }
+
+    // Botón secundario
+    &--secondary {
+        background-color: var(--color-button-secondary);
+        color: var(--color-focus);
+
+        &:hover:not(:disabled) {
+            background-color: var(--color-button-secondary-hover);
+        }
+    }
+
+    // Estado deshabilitado
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--color-focus);
+        outline-offset: 3px;
+    }
+}

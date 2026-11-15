@@ -1,0 +1,23 @@
+<div class="input-field">
+  <input
+    class="input-field__control"
+    [class.input-field__control--with-icon]="!!icon()"
+    [type]="type()"
+    [placeholder]="placeholder()"
+    [value]="value()"
+    [disabled]="disabled()"
+    (input)="onInput($event)"
+  />
+
+  @if (icon(); as iconName) {
+    <button
+      type="button"
+      class="input-field__icon-button"
+      [disabled]="disabled()"
+      [attr.aria-label]="iconLabel()"
+      (click)="onIconClick()"
+    >
+      <mat-icon aria-hidden="true">{{ iconName }}</mat-icon>
+    </button>
+  }
+</div>

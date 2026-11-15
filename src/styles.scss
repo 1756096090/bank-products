@@ -32,6 +32,19 @@ body {
 // Colores de la aplicación.
 
 :root {
+  --color-input-border: #d0d5dd;
+  --color-text-placeholder: #98a2b3;
+  --color-input-focus: #344d85;
+  --color-input-focus-shadow: rgb(52 77 133 / 12%);
+  --color-surface-disabled: #f2f4f7;
+  --color-button-primary: #ffe66d;
+  --color-button-primary-hover: #f7d94e;
+  --color-button-secondary: #e9ecf3;
+  --color-button-secondary-hover: #dce1eb;
+  --color-button-add: #f9e66c;
+  --color-button-add-text: #24335a;
+  --color-button-add-hover: #f1d943;
+
   --color-error: var(--mat-sys-error);
   --color-surface: #ffffff;
   --color-avatar-background: #c6ccda;
