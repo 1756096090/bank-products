@@ -42,6 +42,7 @@
 
   // Tabla
   &__scroll {
+    position: relative;
     width: 100%;
     overflow-x: auto;
   }
@@ -200,8 +201,8 @@
 
   &__pagination {
     display: flex;
-    align-items: center;
     flex-wrap: wrap;
+    align-items: center;
     gap: 12px;
   }
 

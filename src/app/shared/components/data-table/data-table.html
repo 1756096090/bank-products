@@ -1,8 +1,6 @@
 <section class="data-table">
-
   <!-- Encabezado -->
   <header class="data-table__header">
-
     <div class="data-table__title">
       <ng-content select="[table-title]" />
     </div>
@@ -10,45 +8,30 @@
     <div class="data-table__actions">
       <ng-content select="[table-actions]" />
     </div>
-
   </header>
 
   <!-- Tabla -->
   <div class="data-table__scroll" cdkScrollable>
-
     <table class="data-table__table">
-
       <!-- Encabezados -->
       <thead class="data-table__thead">
         <tr class="data-table__row">
-
           @for (column of columns(); track column.key) {
-            <th
-              class="data-table__th"
-              scope="col"
-              [style.width]="column.width"
-            >
+            <th class="data-table__th" scope="col" [style.width]="column.width">
               {{ column.header }}
             </th>
           }
 
           @if (actions().length > 0) {
-            <th
-              class="data-table__th data-table__th--actions"
-              scope="col"
-            >
-              <span class="data-table__sr-only">
-                Acciones
-              </span>
+            <th class="data-table__th data-table__th--actions" scope="col">
+              <span class="data-table__sr-only"> Acciones </span>
             </th>
           }
-
         </tr>
       </thead>
 
       <!-- Registros -->
       <tbody class="data-table__tbody">
-
         @if (errorMessage(); as message) {
           <tr class="data-table__row">
             <td [attr.colspan]="columns().length + (actions().length > 0 ? 1 : 0)">
@@ -59,148 +42,117 @@
             </td>
           </tr>
         } @else {
+          @for (row of visibleRows(); track row) {
+            <tr class="data-table__row">
+              <!-- Columnas -->
+              @for (column of columns(); track column.key) {
+                <td class="data-table__cell">
+                  @if (getCellTemplate(column.key); as cellTemplate) {
+                    <!-- Celda personalizada -->
+                    <ng-container
+                      [ngTemplateOutlet]="cellTemplate.template"
+                      [ngTemplateOutletContext]="{
+                        $implicit: row,
+                        value: row[column.key],
+                        column: column,
+                      }"
+                    />
+                  } @else {
+                    <!-- Texto -->
+                    {{ row[column.key] }}
+                  }
+                </td>
+              }
 
-        @for (row of visibleRows(); track row) {
-          <tr class="data-table__row">
+              <!-- Acciones -->
+              @if (actions().length > 0) {
+                <td class="data-table__cell data-table__cell--actions">
+                  <div class="data-table__action-wrapper">
+                    <button
+                      cdkOverlayOrigin
+                      #actionOrigin="cdkOverlayOrigin"
+                      type="button"
+                      class="data-table__action-button"
+                      aria-label="Mostrar acciones"
+                      [attr.aria-expanded]="openedRow() === row"
+                      (click)="toggleActions(row)"
+                    >
+                      <mat-icon>more_vert</mat-icon>
+                    </button>
 
-            <!-- Columnas -->
-            @for (column of columns(); track column.key) {
-              <td class="data-table__cell">
+                    <ng-template
+                      cdkConnectedOverlay
+                      [cdkConnectedOverlayOrigin]="actionOrigin"
+                      [cdkConnectedOverlayOpen]="openedRow() === row"
+                      [cdkConnectedOverlayPositions]="actionMenuPositions"
+                      [cdkConnectedOverlayViewportMargin]="8"
+                      [cdkConnectedOverlayPush]="true"
+                      [cdkConnectedOverlayHasBackdrop]="true"
+                      cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop"
+                      (backdropClick)="openedRow.set(null)"
+                      (overlayKeydown)="$event.key === 'Escape' && openedRow.set(null)"
+                    >
+                      <div class="data-table__action-menu">
+                        @for (action of actions(); track action.label) {
+                          <button
+                            type="button"
+                            class="data-table__action-item"
+                            [style.width]="action.width"
+                            (click)="executeAction(action, row)"
+                          >
+                            @if (action.src) {
+                              <img class="data-table__action-image" [src]="action.src" alt="" />
+                            } @else if (action.icon) {
+                              <mat-icon class="data-table__action-icon">
+                                {{ action.icon }}
+                              </mat-icon>
+                            }
 
-                @if (getCellTemplate(column.key); as cellTemplate) {
-
-                  <!-- Celda personalizada -->
-                  <ng-container
-                    [ngTemplateOutlet]="cellTemplate.template"
-                    [ngTemplateOutletContext]="{
-                      $implicit: row,
-                      value: row[column.key],
-                      column: column
-                    }"
-                  />
-
-                } @else {
-
-                  <!-- Texto -->
-                  {{ row[column.key] }}
-
-                }
-
+                            <span>{{ action.label }}</span>
+                          </button>
+                        }
+                      </div>
+                    </ng-template>
+                  </div>
+                </td>
+              }
+            </tr>
+          } @empty {
+            <tr class="data-table__row">
+              <td
+                class="data-table__empty"
+                [attr.colspan]="columns().length + (actions().length > 0 ? 1 : 0)"
+              >
+                No hay registros disponibles.
               </td>
-            }
-
-            <!-- Acciones -->
-            @if (actions().length > 0) {
-              <td class="data-table__cell data-table__cell--actions">
-
-                <div class="data-table__action-wrapper">
-
-                  <button
-                    cdkOverlayOrigin
-                    #actionOrigin="cdkOverlayOrigin"
-                    type="button"
-                    class="data-table__action-button"
-                    aria-label="Mostrar acciones"
-                    [attr.aria-expanded]="openedRow() === row"
-                    (click)="toggleActions(row)"
-                  >
-                    <mat-icon>more_vert</mat-icon>
-                  </button>
-
-                  <ng-template
-                    cdkConnectedOverlay
-                    [cdkConnectedOverlayOrigin]="actionOrigin"
-                    [cdkConnectedOverlayOpen]="openedRow() === row"
-                    [cdkConnectedOverlayPositions]="actionMenuPositions"
-                    [cdkConnectedOverlayViewportMargin]="8"
-                    [cdkConnectedOverlayPush]="true"
-                    (overlayOutsideClick)="openedRow.set(null)"
-                    (overlayKeydown)="$event.key === 'Escape' && openedRow.set(null)"
-                  >
-                    <div class="data-table__action-menu">
-
-                      @for (action of actions(); track action.label) {
-                        <button
-                          type="button"
-                          class="data-table__action-item"
-                          [style.width]="action.width"
-                          (click)="executeAction(action, row)"
-                        >
-
-                          @if (action.src) {
-                            <img
-                              class="data-table__action-image"
-                              [src]="action.src"
-                              alt=""
-                            />
-                          } @else if (action.icon) {
-                            <mat-icon class="data-table__action-icon">
-                              {{ action.icon }}
-                            </mat-icon>
-                          }
-
-                          <span>{{ action.label }}</span>
-
-                        </button>
-                      }
-
-                    </div>
-                  </ng-template>
-
-                </div>
-
-              </td>
-            }
-
-          </tr>
-        } @empty {
-          <tr class="data-table__row">
-            <td
-              class="data-table__empty"
-              [attr.colspan]="columns().length + (actions().length > 0 ? 1 : 0)"
-            >
-              No hay registros disponibles.
-            </td>
-          </tr>
-        }
-
+            </tr>
+          }
         }
       </tbody>
     </table>
-
   </div>
 
   <!-- Pie de tabla -->
   <footer class="data-table__footer">
-
-    <span class="data-table__results">
-      {{ total() }} Resultados
-    </span>
+    <span class="data-table__results"> {{ total() }} Resultados </span>
 
     <div class="data-table__pagination">
-      <label class="data-table__page-size">
-
       @if (total() > 0 && !errorMessage()) {
-        <app-paginator [totalPages]="totalPages()" [(page)]="currentPage"
-          (pageChange)="openedRow.set(null)" />
+        <app-paginator
+          [totalPages]="totalPages()"
+          [(page)]="currentPage"
+          (pageChange)="openedRow.set(null)"
+        />
       }
-        <span class="data-table__sr-only">
-          Registros por página
-        </span>
+      <label class="data-table__page-size">
+        <span class="data-table__sr-only"> Registros por página </span>
 
-        <select
-          class="data-table__select"
-          [value]="pageSize()"
-          (change)="onPageSizeChange($event)"
-        >
+        <select class="data-table__select" [value]="pageSize()" (change)="onPageSizeChange($event)">
           @for (option of pageSizeOptions(); track option) {
             <option [value]="option">{{ option }}</option>
           }
         </select>
-
       </label>
     </div>
-
   </footer>
-
 </section>
