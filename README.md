@@ -1,70 +1,51 @@
-# Prueba técnica Angular para Devsu
+# Productos financieros
 
-Sistema de gestión de productos financieros desarrollado con Angular 22, TypeScript, arquitectura limpia, principios SOLID y Jest.
+Aplicación Angular 22 con listado, búsqueda, paginación, registro, edición y eliminación de productos.
 
-## Instalación
+Interfaz responsive adaptable a móviles, tablets y escritorio.
 
-Requiere Node.js 22.22.3 o superior dentro de 22.x, o 24.15.0 o superior dentro de 24.x, y npm.
+## Instalación y ejecución
+
+Requiere Node.js 22.22.3+ (22.x) o 24.15.0+ (24.x), npm y Git.
 
 ```bash
 npm ci
-```
-
-## Ejecución
-
-Inicia el backend en `http://localhost:3002` y ejecuta:
-
-```bash
 npm start
 ```
 
-Abre `http://localhost:4200`. El proxy de desarrollo redirige las peticiones `/bp` al backend.
+Abre `http://localhost:4200`.
 
-Para usar datos de prueba, configura `useMocks: true` en `src/environments/environment.development.ts`.
+- **Sin backend (por defecto):** `src/environments/environment.development.ts` usa `useMocks: true`. Los cambios se guardan en memoria y se pierden al recargar.
+- **Con backend:** usa `useMocks: false` e inicia la API externa en `http://localhost:3002`. El proxy de `proxy.conf.json` redirige `/bp` a esa dirección.
 
-## Arquitectura
+Reinicia `npm start` después de cambiar la configuración. Las fuentes e íconos requieren conexión a Google Fonts.
 
-- `features/products/domain`: modelo en camelCase, errores de dominio y contrato del repositorio.
-- `features/products/application`: ProductService, servicio que usan las páginas y los validadores.
-- `features/products/data`: repositorios HTTP y mock, DTOs de la API y conversores de productos y errores.
-- `features/products/presentation`: páginas y lógica de interfaz.
-- `shared/components`: tabla, avatar, encabezado y campos reutilizables.
-- `shared/forms`: integración con ControlValueAccessor y mensajes de validación compartidos.
-- `core/http`: interceptor con logs estructurados y el patrón Correlation ID. Cada petición genera un UUID que se envía en `X-Request-ID` y relaciona los logs de petición, respuesta y error.
-- `styles`: breakpoints y mixins de SCSS compartidos. Los colores están en `src/styles.scss`.
-
-Las páginas usan ProductService. La inyección de dependencias selecciona el repositorio; los detalles HTTP y los campos snake_case de la API quedan en la capa de datos.
-
-## Pruebas
-
-Jest calcula la cobertura por defecto y exige un mínimo del 70% en sentencias, ramas, funciones y líneas. La ejecución falla si alguna métrica queda por debajo del mínimo.
+## Pruebas y compilación
 
 ```bash
-npm test -- --run-in-band --watch=false
-npm test -- --run-in-band --watch=false --coverage
-```
-
-## Compilación
-
-```bash
+npm run test:coverage
 npm run build
 ```
 
-Los archivos generados quedan en `dist/bank-products`.
+Las pruebas usan Jest y no requieren backend. La cobertura mínima es 70 % en líneas, sentencias, ramas y funciones; los reportes quedan en `coverage/`. Husky comprueba formato, pruebas y cobertura antes de cada commit.
+
+La compilación usa `src/environments/environment.ts` para configurar la API o los mocks. Los archivos generados quedan en `dist/bank-products/browser`.
+
+## Arquitectura
+
+- `features/products/domain`: modelos, errores y contrato del repositorio.
+- `features/products/application`: servicio de productos.
+- `features/products/data`: repositorios HTTP y mock, DTOs y conversores.
+- `features/products/presentation`: páginas y validaciones.
+- `shared`: componentes, formularios y pipes reutilizables.
+- `core/http`: interceptor de logs e identificadores de petición.
+- `styles`: mixins y breakpoints; colores en `src/styles.scss`.
+
+Las páginas usan el servicio de productos; la inyección de dependencias selecciona el repositorio HTTP o mock.
 
 ## Convenciones
 
-Las clases SCSS siguen BEM: `bloque__elemento--modificador`, por ejemplo `input-field__control--invalid`.
-
-Los mensajes de commit siguen Conventional Commits, por ejemplo `feat(products): add registration form` o `fix(table): correct mobile menu`.
-
-Prettier aplica el formato del código. Antes de cada commit, Husky ejecuta Prettier mediante lint-staged sobre los archivos preparados y bloquea el commit si el formato falla.
-
-```bash
-npm run format
-npm run format:check
-```
-
-## Funcionalidades
-
-Listado con búsqueda y paginación, registro, edición por ID en la URL y eliminación con confirmación.
+- **Commits:** Conventional Commits, por ejemplo `feat(products): add product` o `fix(table): correct pagination`.
+- **Estilos:** SCSS con BEM (`bloque__elemento--modificador`).
+- **Formato:** Prettier; usa `npm run format` para aplicar y `npm run format:check` para verificar.
+- **Pruebas:** archivos `*.spec.ts` junto al código que prueban.
