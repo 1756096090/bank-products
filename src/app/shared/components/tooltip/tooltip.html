@@ -1,0 +1,23 @@
+<button
+  #trigger
+  type="button"
+  class="tooltip__trigger"
+  [attr.aria-label]="label()"
+  [attr.aria-describedby]="id"
+  (click)="show()"
+>
+  <ng-content />
+</button>
+<span
+  #bubble
+  class="tooltip__bubble"
+  role="tooltip"
+  [id]="id"
+  [class.tooltip__bubble--visible]="visible()"
+  [class.tooltip__bubble--bottom]="placement() === 'bottom'"
+  [style.left.px]="left()"
+  [style.top.px]="top()"
+  [style.--arrow-left]="arrowLeft() + 'px'"
+>
+  {{ text() }}
+</span>

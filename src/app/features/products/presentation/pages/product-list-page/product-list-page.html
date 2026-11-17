@@ -42,12 +42,12 @@
 
       <!-- Fecha de liberación -->
       <ng-template tableCell="dateRelease" let-product>
-        {{ product.dateRelease | date: 'dd/MM/yyyy' : 'UTC' }}
+        {{ product.dateRelease | displayDate }}
       </ng-template>
 
       <!-- Fecha de reestructuración -->
       <ng-template tableCell="dateRevision" let-product>
-        {{ product.dateRevision | date: 'dd/MM/yyyy' : 'UTC' }}
+        {{ product.dateRevision | displayDate }}
       </ng-template>
     </app-data-table>
   </div>

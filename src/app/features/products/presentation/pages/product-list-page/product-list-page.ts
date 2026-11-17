@@ -7,7 +7,7 @@ import {
   signal,
 } from '@angular/core';
 
-import { DatePipe } from '@angular/common';
+import { DisplayDatePipe } from '../../../../../shared/pipes/display-date.pipe';
 import { Router, RouterLink } from '@angular/router';
 
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
@@ -38,7 +38,7 @@ import { ProductService } from '../../../application/product.service';
     CustomButton,
     RouterLink,
     TableCellDirective,
-    DatePipe,
+    DisplayDatePipe,
     ConfirmationDialog,
   ],
   templateUrl: './product-list-page.html',
@@ -66,9 +66,24 @@ export class ProductListPage {
   readonly columns: TableColumn<Product>[] = [
     { key: 'logo', header: 'Logo', width: '12%' },
     { key: 'name', header: 'Nombre del producto', width: '22%' },
-    { key: 'description', header: 'Descripción', width: '28%' },
-    { key: 'dateRelease', header: 'Fecha de liberación', width: '19%' },
-    { key: 'dateRevision', header: 'Fecha de reestructuración', width: '19%' },
+    {
+      key: 'description',
+      header: 'Descripción',
+      width: '28%',
+      info: 'Características y detalles del producto financiero.',
+    },
+    {
+      key: 'dateRelease',
+      header: 'Fecha de liberación',
+      width: '19%',
+      info: 'Fecha en la que el producto estará disponible.',
+    },
+    {
+      key: 'dateRevision',
+      header: 'Fecha de reestructuración',
+      width: '19%',
+      info: 'Fecha prevista para la revisión del producto.',
+    },
   ];
 
   // Acciones

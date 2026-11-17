@@ -21,7 +21,18 @@
         <tr class="data-table__row">
           @for (column of columns(); track column.key) {
             <th class="data-table__th" scope="col" [style.width]="column.width">
-              {{ column.header }}
+              <span class="data-table__column-heading">
+                {{ column.header }}
+                @if (column.info; as info) {
+                  <app-tooltip
+                    class="data-table__info"
+                    [text]="info"
+                    [label]="'Información sobre ' + column.header"
+                  >
+                    <app-icon name="info" />
+                  </app-tooltip>
+                }
+              </span>
             </th>
           }
 

@@ -1,0 +1,73 @@
+:host {
+  display: inline-flex;
+  align-items: center;
+}
+
+.tooltip__trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: help;
+
+  &:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 4px;
+    border-radius: 50%;
+  }
+}
+
+.tooltip__bubble {
+  position: fixed;
+  z-index: 1100;
+  box-sizing: border-box;
+  width: max-content;
+  max-width: min(260px, calc(100vw - 16px));
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: #111;
+  color: #fff;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 18%);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.45;
+  text-align: center;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 120ms ease;
+
+  &--visible {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: var(--arrow-left);
+    transform: translateX(-50%);
+    border: 7px solid transparent;
+    border-bottom: 0;
+    border-top-color: #111;
+  }
+
+  &--bottom::after {
+    top: auto;
+    bottom: 100%;
+    border: 7px solid transparent;
+    border-top: 0;
+    border-bottom-color: #111;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tooltip__bubble {
+    transition: none;
+  }
+}
