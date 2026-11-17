@@ -4,6 +4,7 @@ import { ProductService } from './product.service';
 import { PRODUCT_REPOSITORY } from '../domain/repositories/product-repository.token';
 import { ProductError } from '../domain/errors/product.error';
 import { MOCK_PRODUCTS } from '../data/mocks/products.mock';
+import { ErrorDialogService } from '../../../shared/components/error-dialog/error-dialog.service';
 
 describe('ProductService', () => {
   let service: ProductService;
@@ -28,6 +29,32 @@ describe('ProductService', () => {
     repository.create.mockReturnValue(of(MOCK_PRODUCTS[0]));
     repository.update.mockReturnValue(of(MOCK_PRODUCTS[0]));
     repository.delete.mockReturnValue(of(undefined));
+  });
+
+  it.each(['list', 'load', 'save', 'delete'] as const)(
+    'muestra el mensaje del servicio en errores no contemplados al %s',
+    (operation) => {
+      expect(
+        service.errorMessage(new ProductError('service', 422, 'Fecha no permitida.'), operation),
+      ).toBe('Fecha no permitida.');
+      expect(service.errorMessage(new ProductError('service', 500, '   '), operation)).toContain(
+        'Error de servicio 500',
+      );
+    },
+  );
+
+  it('abre el diálogo con el mensaje del backend y propaga el error', async () => {
+    const error = new ProductError('service', 422, 'Operación no permitida.');
+    repository.getAll.mockReturnValue(throwError(() => error));
+    await expect(firstValueFrom(service.getAll())).rejects.toBe(error);
+    expect(TestBed.inject(ErrorDialogService).message()).toBe('Operación no permitida.');
+  });
+
+  it('mantiene los errores conocidos en su flujo habitual sin abrir el diálogo', async () => {
+    const error = new ProductError('connection', 0);
+    repository.getAll.mockReturnValue(throwError(() => error));
+    await expect(firstValueFrom(service.getAll())).rejects.toBe(error);
+    expect(TestBed.inject(ErrorDialogService).message()).toBe('');
   });
 
   it('expone las operaciones de productos a la presentación', async () => {

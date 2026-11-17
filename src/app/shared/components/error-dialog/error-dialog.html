@@ -1,0 +1,17 @@
+<dialog
+  #dialog
+  class="error-dialog"
+  role="alertdialog"
+  aria-labelledby="service-error-title"
+  aria-describedby="service-error-message"
+  (cancel)="dismiss($event)"
+  (close)="state.close()"
+>
+  <div class="error-dialog__content">
+    <h2 id="service-error-title">No se pudo completar la operación</h2>
+    <p id="service-error-message">{{ state.message() }}</p>
+  </div>
+  <footer class="error-dialog__actions">
+    <app-custom-button (clicked)="dismiss()">Aceptar</app-custom-button>
+  </footer>
+</dialog>

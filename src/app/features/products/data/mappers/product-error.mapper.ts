@@ -8,7 +8,11 @@ export function productErrorFromHttp(error: unknown): ProductError {
   if (error.status === 0) return new ProductError('connection', 0);
   if (error.status === 404) return new ProductError('notFound', 404);
   if (error.status === 409) return new ProductError('duplicateId', 409);
-  return new ProductError('service', error.status);
+  const body: unknown = error.error;
+  const message =
+    body !== null && typeof body === 'object' && 'message' in body ? body.message : undefined;
+  const serviceMessage = typeof message === 'string' ? message.trim() || undefined : undefined;
+  return new ProductError('service', error.status, serviceMessage);
 }
 
 export function handleProductError<T>(): OperatorFunction<T, T> {

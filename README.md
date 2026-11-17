@@ -31,6 +31,8 @@ Las pruebas usan Jest y no requieren backend. La cobertura mínima es 70 % en l�
 
 La compilación usa `src/environments/environment.ts` para configurar la API o los mocks. Los archivos generados quedan en `dist/bank-products/browser`.
 
+Para usar la API con `npm run build`, el backend debe permitir CORS desde el origen del frontend; el proxy solo funciona con `npm start`.
+
 ## Arquitectura
 
 - `features/products/domain`: modelos, errores y contrato del repositorio.
